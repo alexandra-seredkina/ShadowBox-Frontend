@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { connection } from "next/server";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -19,11 +20,14 @@ export const metadata: Metadata = {
   description: "Анонимная и безопасная электронная почта",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // CSP nonce is generated per request, so pages must render dynamically
+  await connection();
+
   return (
     <html lang="ru">
       <head>
