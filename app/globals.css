@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-night: #0b0c0f;
+  --color-ink: #14171b;
+  --color-surface: #15181d;
+  --color-surface-2: #1c2026;
+  --color-line: #2a2e36;
+  --color-paper: #f5f5f7;
+  --color-steel: #b8bac4;
+  --color-fog: #8e91a0;
+  --color-red: #e8334a;
+  --color-red-soft: #ff5c6e;
+  --color-red-deep: #c21f37;
+  --color-wine: #2a0e14;
+  --color-safe: #2fb37e;
+  --color-warn: #e2a03a;
+
+  --radius-card: 14px;
+  --radius-control: 8px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-unbounded), "Arial Black", system-ui, sans-serif;
+  --font-sans: var(--font-onest), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* The brand is dark-first: one theme, no light variant. */
+:root {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-night);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--color-red);
+  color: var(--color-night);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-red-soft);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
