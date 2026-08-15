@@ -9,14 +9,25 @@
 - Next.js 16 (App Router), React 19
 - Tailwind CSS 4
 - Content Security Policy с nonce на каждый запрос (`proxy.ts`)
+- zod для проверки ответов API, Vitest для тестов
 
 ## Разработка
 
-Фронтенд запускается вместе с остальными сервисами через `docker compose up --build` из репозитория бэкенда. Отдельно, без API:
+Фронтенд запускается вместе с остальными сервисами через `docker compose up --build` из репозитория бэкенда. Отдельно, без API, на моках:
 
 ```bash
 npm install
-npm run dev
+NEXT_PUBLIC_API_MODE=mock npm run dev
+```
+
+`NEXT_PUBLIC_API_MODE` выбирает реализацию API-клиента: `http` (по умолчанию) или `mock`. Моки повторяют контракт API, включая ошибки и задержки.
+
+Проверки:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
 ```
 
 ## Лицензия
