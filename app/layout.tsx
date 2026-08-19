@@ -1,11 +1,42 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { connection } from "next/server";
+import { publicEnv } from "@/shared/config/public-env";
 import { jetbrainsMono, onest, unbounded } from "./fonts";
 import "./globals.css";
 
+const DESCRIPTION =
+  "Почта без телефона и имени: отдельный адрес для каждого сайта, письма шифруются при получении и читаются только в твоём браузере.";
+
+const OG_IMAGE = {
+  url: "/images/og-image.jpg",
+  width: 1200,
+  height: 630,
+  alt: "ShadowBox — анонимная зашифрованная почта",
+};
+
 export const metadata: Metadata = {
-  title: "ShadowBox",
-  description: "Анонимная и безопасная электронная почта",
+  ...(publicEnv.siteUrl ? { metadataBase: new URL(publicEnv.siteUrl) } : {}),
+  title: { default: "ShadowBox — анонимная зашифрованная почта", template: "%s · ShadowBox" },
+  description: DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    siteName: "ShadowBox",
+    title: "ShadowBox — анонимная зашифрованная почта",
+    description: DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ShadowBox — анонимная зашифрованная почта",
+    description: DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0b0c0f",
+  colorScheme: "dark",
 };
 
 export default async function RootLayout({
