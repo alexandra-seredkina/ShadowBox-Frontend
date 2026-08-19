@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// next/image renders style="color:transparent" on every image; allow exactly that attribute.
+const NEXT_IMAGE_STYLE_HASH = "'sha256-zlqnbDt84zf1iSefLU/ImC54isoprH/MRiVZGskwexk='";
+
 export function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const isDev = process.env.NODE_ENV === "development";
@@ -7,7 +10,7 @@ export function proxy(request: NextRequest) {
   const csp = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-    `style-src 'self' ${isDev ? "'unsafe-inline'" : `'nonce-${nonce}'`}`,
+    `style-src 'self' ${isDev ? "'unsafe-inline'" : `'nonce-${nonce}' 'unsafe-hashes' ${NEXT_IMAGE_STYLE_HASH}`}`,
     "img-src 'self' blob: data:",
     "font-src 'self'",
     "connect-src 'self'",
