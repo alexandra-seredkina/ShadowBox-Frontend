@@ -10,6 +10,7 @@
 - Tailwind CSS 4
 - Content Security Policy с nonce на каждый запрос (`proxy.ts`)
 - zod для проверки ответов API, Vitest для тестов
+- Интерфейс на русском, английском и немецком: `/ru`, `/en`, `/de`; без префикса язык выбирается по `Accept-Language`
 
 ## Разработка
 

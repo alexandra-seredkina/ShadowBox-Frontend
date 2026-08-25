@@ -27,7 +27,6 @@ export function SignUpIllustration({ labels }: { readonly labels: SignUpLabels }
   );
 }
 
-type AddressesLabels = readonly [string, string, string, string];
 
 function Envelope({ x, y, isAccent }: { readonly x: number; readonly y: number; readonly isAccent: boolean }): ReactElement {
   const stroke = isAccent ? "stroke-red" : "stroke-paper";
@@ -41,7 +40,7 @@ function Envelope({ x, y, isAccent }: { readonly x: number; readonly y: number; 
 
 const ENVELOPE_ROWS = [12, 47, 82, 117] as const;
 
-export function AddressesIllustration({ labels }: { readonly labels: AddressesLabels }): ReactElement {
+export function AddressesIllustration({ labels }: { readonly labels: readonly string[] }): ReactElement {
   return (
     <svg viewBox="0 0 240 160" aria-hidden className="h-auto w-full">
       <circle cx="40" cy="62" r="15" className="fill-paper" />
