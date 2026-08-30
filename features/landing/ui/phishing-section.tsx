@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import type { Messages } from "@/shared/i18n/messages";
 import { Badge } from "@/shared/ui/badge";
 import { CoverBand } from "./cover-band";
-import { SectionHeading } from "./section-heading";
+import { SectionHeading } from "@/shared/ui/section-heading";
 
 export function PhishingSection({ messages }: { readonly messages: Messages["phishing"] }): ReactElement {
   const { badges } = messages;

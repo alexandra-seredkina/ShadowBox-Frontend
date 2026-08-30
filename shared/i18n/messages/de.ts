@@ -124,4 +124,139 @@ export const de: Messages = {
     text: "Login und Passwort. Mehr braucht es nicht.",
     button: "Postfach erstellen",
   },
+  securityPage: {
+    meta: {
+      title: "Sicherheit",
+      description:
+        "Wie ShadowBox Post verschlüsselt, was der Server sieht und wo der Schutz endet. Ein ehrliches Bedrohungsmodell.",
+    },
+    intro: {
+      eyebrow: "Sicherheit",
+      title: "So funktioniert der Schutz",
+      lede: "Wie eine Nachricht zu dir kommt, wer unterwegs was sehen kann und wo unser Schutz endet. Ohne große Versprechen.",
+    },
+    flow: {
+      eyebrow: "Der Weg einer Nachricht",
+      title: "Vom Absender bis auf deinen Bildschirm",
+      lede: "Den Klartext einer Nachricht gibt es beim Absender und in deinem Browser. Und für einen Moment im Speicher unseres Servers, während er sie annimmt.",
+      steps: [
+        {
+          title: "Absender",
+          text: "Die Nachricht kommt per SMTP zu uns, wie jede E-Mail. Die Verbindung ist mit TLS geschützt, die Nachricht selbst kommt aber im Klartext an: So funktioniert das Protokoll.",
+        },
+        {
+          title: "Empfang auf dem Server",
+          text: "Der Server prüft SPF, DKIM und DMARC, sucht nach Anzeichen von Phishing und verschlüsselt die Nachricht sofort mit deinem öffentlichen Schlüssel. Klartext gibt es nur im Arbeitsspeicher, nie auf der Festplatte oder in Logs.",
+        },
+        {
+          title: "Speicher",
+          text: "In der Datenbank liegt Chiffretext: Absender, Betreff, Text und Anhänge. Öffnen kann ihn nur dein privater Schlüssel, und den hat der Server nicht.",
+        },
+        {
+          title: "Dein Browser",
+          text: "Nach Eingabe deines Passworts entsperrt der Browser deinen privaten Schlüssel und entschlüsselt deine Post. Der Schlüssel lebt nur im Speicher des Tabs und ist nach einem Neuladen weg.",
+        },
+      ],
+      diagram: {
+        smtp: "SMTP",
+        captions: ["Klartext", "nur im Speicher", "nur Chiffretext", "hier entschlüsselt"],
+      },
+    },
+    keys: {
+      eyebrow: "Passwort und Schlüssel",
+      title: "Dein Passwort erreicht den Server nie",
+      items: [
+        {
+          title: "Zwei Schlüssel aus einem Passwort",
+          text: "Dein Browser schickt das Passwort durch Argon2id und leitet daraus einen Anmeldeschlüssel und einen Verschlüsselungsschlüssel ab. Der Server bekommt nur den Anmeldeschlüssel, und daraus lässt sich das Passwort nicht zurückgewinnen.",
+        },
+        {
+          title: "Dein privater Schlüssel bleibt verschlossen",
+          text: "Bei der Registrierung erzeugt dein Browser ein X25519-Schlüsselpaar. Mit dem öffentlichen Schlüssel verschlüsselt der Server eingehende Post. Der private wird nur verschlüsselt mit deinem Verschlüsselungsschlüssel gespeichert.",
+        },
+        {
+          title: "Recovery-Phrase",
+          text: "24 Wörter, die eine zweite Kopie deines privaten Schlüssels öffnen. Wir zeigen die Phrase einmal, und sie erreicht den Server nie. Wiederherstellung damit kommt später, speichern musst du sie aber schon jetzt.",
+        },
+        {
+          title: "Statt Captcha",
+          text: "Gegen Massenregistrierungen löst dein Browser ein paar Sekunden lang eine Rechenaufgabe. Keine Captchas von Dritten und keine ihrer Skripte.",
+        },
+      ],
+    },
+    model: {
+      eyebrow: "Bedrohungsmodell",
+      title: "Was wir schützen und was nicht",
+      lede: "Wir gehen vom Schlimmsten aus: Angreifer kann jeder sein, der einen vollständigen Dump von Datenbank, Logs und Festplatte hat. Auch wir selbst.",
+      protectsTitle: "Wir schützen",
+      protects: [
+        "Den Inhalt deiner Post, wenn Datenbank oder Backup geleakt werden: Dort liegt nur Chiffretext.",
+        "Dein Passwort: Der Server bekommt es weder bei der Registrierung noch bei der Anmeldung.",
+        "Die Verbindung zwischen deinen Adressen: Sie sind zufällig und verraten weder deinen Login noch einander.",
+        "Ob du eine Nachricht geöffnet hast: Externe Bilder und Tracking-Pixel sind ausgeblendet.",
+        "Adressbezeichnungen und Ordnernamen: Sie werden in deinem Browser verschlüsselt.",
+        "Sitzungen: Das Cookie ist für Skripte unerreichbar, jede Sitzung lässt sich beenden, und standardmäßig ist sie an deine IP gebunden.",
+      ],
+      limitsTitle: "Wir schützen nicht",
+      limits: [
+        "Eine Nachricht im Moment des Empfangs. Gewöhnliche Post kommt im Klartext an, und ein kompromittierter Server könnte neue Nachrichten vor der Verschlüsselung lesen. Bereits gespeicherte bleiben verschlossen.",
+        "Metadaten. Der Server sieht, wann und an welche Adresse eine Nachricht kam, ihre Größe und die Absenderprüfungen.",
+        "Manipulierten Website-Code. Die App wird von unserem Server geladen. Ist der Server kompromittiert, könnte dein Browser Code bekommen, der dein Passwort abgreift.",
+        "Ein infiziertes Gerät. Malware oder eine Browser-Erweiterung, die den offenen Tab sieht, sieht auch deine Post.",
+        "Ein schwaches Passwort. Mit einem Datenbank-Dump lässt sich das Passwort offline erraten. Argon2id macht jeden Versuch teuer, wirklich hilft aber nur ein langes, einzigartiges Passwort.",
+        "Deine IP während der Verbindung. Der Server sieht sie, auch wenn er sie nicht speichert. Wenn dir das wichtig ist, verbinde dich über Tor oder ein VPN.",
+        "Ein vergessenes Passwort zusammen mit einer verlorenen Phrase. Ohne beides kann niemand Zugang und Post wiederherstellen, auch wir nicht.",
+      ],
+    },
+    adversaries: {
+      title: "Wer angreifen könnte und was er bekommt",
+      whoLabel: "Wer",
+      getsLabel: "Was er bekommt",
+      rows: [
+        {
+          who: "Angreifer von außen",
+          gets: "Ausprobieren und Phishing stoßen auf Anfragelimits, Proof-of-Work und Warnmarkierungen. HTML aus Nachrichten wird in einem isolierten Rahmen ohne Skripte angezeigt.",
+        },
+        {
+          who: "Inhaber eines anderen Kontos",
+          gets: "Nichts. Jede Anfrage prüft, dass die Ressource dir gehört, und eine fremde sieht aus, als gäbe es sie nicht.",
+        },
+        {
+          who: "Sitzungsdieb",
+          gets: "Das Cookie ist für Skripte unerreichbar und enthält keine Schlüssel. Konto oder dauerhafte Adresse löschen verlangt erneut das Passwort.",
+        },
+        {
+          who: "Leak von Datenbank oder Backup",
+          gets: "Verschlüsselte Post, verschlüsselte Schlüssel, IP-Hashes und Metadaten. Ohne dein Passwort bleibt die Post unlesbar, ein schwaches Passwort lässt sich aber erraten.",
+        },
+        {
+          who: "Server-Betreiber",
+          gets: "Metadaten und neue Nachrichten im Moment des Empfangs. Gespeicherte Post bleibt auch für ihn ohne dein Passwort verschlossen.",
+        },
+        {
+          who: "Spammer",
+          gets: "Jede Registrierung kostet Rechenzeit und stößt an Limits.",
+        },
+      ],
+    },
+    data: {
+      title: "Was wir über dich speichern",
+      storedTitle: "Gespeichert",
+      stored: [
+        "Dein Login. Er dient nur zur Anmeldung und wird niemandem gezeigt.",
+        "Ein Hash deines Anmeldeschlüssels und das Salt zur Schlüsselableitung.",
+        "Dein öffentlicher Schlüssel und zwei verschlüsselte Kopien des privaten.",
+        "Deine Adressen, ihre verschlüsselten Bezeichnungen und Ordner.",
+        "Nachrichten als Chiffretext, dazu Empfangszeit, Größe und Ergebnisse der Absenderprüfung.",
+        "Sitzungen: Browser und Betriebssystem ohne Details, Daten auf den Tag genau, ein IP-Hash höchstens 30 Tage.",
+      ],
+      neverTitle: "Nie gespeichert",
+      never: [
+        "Telefonnummer, Ersatz-E-Mail, Name.",
+        "Dein Passwort und deine Recovery-Phrase.",
+        "Deine IP-Adresse im Klartext und der vollständige User-Agent.",
+        "Analytics, Tracker, Skripte und Schriften von Dritten.",
+      ],
+    },
+  },
 };

@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { PixelTrail } from "./pixel-trail";
+import { PixelTrail } from "@/shared/ui/pixel-trail";
 
 const FRAME = "fill-ink stroke-paper";
 

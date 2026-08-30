@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import type { Messages } from "@/shared/i18n/messages";
 import { CoverBand } from "./cover-band";
-import { SectionHeading } from "./section-heading";
+import { SectionHeading } from "@/shared/ui/section-heading";
 
 const EXAMPLE_ADDRESS = "k7f3mz9q@…";
 

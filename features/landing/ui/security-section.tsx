@@ -4,7 +4,7 @@ import type { Messages } from "@/shared/i18n/messages";
 import { localizePath, type Locale } from "@/shared/i18n/locales";
 import { Card } from "@/shared/ui/card";
 import { Container } from "@/shared/ui/container";
-import { SectionHeading } from "./section-heading";
+import { SectionHeading } from "@/shared/ui/section-heading";
 
 type SecuritySectionProps = {
   readonly locale: Locale;

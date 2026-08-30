@@ -6,7 +6,7 @@ import {
   PrivateReadingIllustration,
   SignUpIllustration,
 } from "./illustrations/step-illustrations";
-import { SectionHeading } from "./section-heading";
+import { SectionHeading } from "@/shared/ui/section-heading";
 
 export function HowItWorksSection({ messages }: { readonly messages: Messages["how"] }): ReactElement {
   const { illustration } = messages;

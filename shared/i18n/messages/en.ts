@@ -116,4 +116,139 @@ export const en: Messages = {
     text: "A login and a password. Nothing else.",
     button: "Create inbox",
   },
+  securityPage: {
+    meta: {
+      title: "Security",
+      description:
+        "How ShadowBox encrypts mail, what the server sees and where protection ends. An honest threat model.",
+    },
+    intro: {
+      eyebrow: "Security",
+      title: "How protection works",
+      lede: "How a message reaches you, who can see what along the way, and where our protection ends. No big promises.",
+    },
+    flow: {
+      eyebrow: "A message's path",
+      title: "From the sender to your screen",
+      lede: "The plain text of a message exists with the sender and in your browser. And for a moment in our server's memory while it receives the message.",
+      steps: [
+        {
+          title: "Sender",
+          text: "The message reaches us over SMTP like any email. The connection is protected by TLS, but the message itself arrives as plain text: that is how the protocol works.",
+        },
+        {
+          title: "Arrival on the server",
+          text: "The server checks SPF, DKIM and DMARC, looks for signs of phishing and immediately encrypts the message with your public key. Plain text exists only in memory and never reaches the disk or the logs.",
+        },
+        {
+          title: "Storage",
+          text: "The database holds ciphertext: sender, subject, body and attachments. Only your private key can open it, and the server does not have it.",
+        },
+        {
+          title: "Your browser",
+          text: "After you enter your password, the browser unlocks your private key and decrypts your mail. The key lives only in the tab's memory and is gone after a reload.",
+        },
+      ],
+      diagram: {
+        smtp: "SMTP",
+        captions: ["plain text", "memory only", "ciphertext only", "decrypted here"],
+      },
+    },
+    keys: {
+      eyebrow: "Password and keys",
+      title: "Your password never reaches the server",
+      items: [
+        {
+          title: "Two keys from one password",
+          text: "Your browser runs the password through Argon2id and derives a sign-in key and an encryption key from the result. The server only gets the sign-in key, and the password cannot be recovered from it.",
+        },
+        {
+          title: "Your private key stays locked",
+          text: "At sign-up your browser creates an X25519 key pair. The server uses the public key to encrypt incoming mail. The private key is stored only encrypted with your encryption key.",
+        },
+        {
+          title: "Recovery phrase",
+          text: "24 words that unlock a second copy of your private key. We show the phrase once, and it never reaches the server. Recovery with it comes later, but you need to save it now.",
+        },
+        {
+          title: "Instead of a captcha",
+          text: "To stop mass sign-ups, your browser solves a small puzzle for a couple of seconds. No third-party captchas and none of their scripts.",
+        },
+      ],
+    },
+    model: {
+      eyebrow: "Threat model",
+      title: "What we protect and what we don't",
+      lede: "We assume the worst: the adversary may be anyone who got a full dump of the database, logs and disk. Including us.",
+      protectsTitle: "We protect",
+      protects: [
+        "Message contents if the database or a backup leaks: there is only ciphertext.",
+        "Your password: the server never receives it, neither at sign-up nor at sign-in.",
+        "The link between your addresses: they are random and reveal neither your login nor each other.",
+        "Whether you opened a message: external images and tracking pixels are hidden.",
+        "Address labels and folder names: they are encrypted in your browser.",
+        "Sessions: the cookie is out of reach for scripts, any session can be ended, and by default it is bound to your IP.",
+      ],
+      limitsTitle: "We don't protect",
+      limits: [
+        "A message at the moment it arrives. Regular mail comes in as plain text, and a compromised server could read new messages before encryption. Messages already stored stay closed.",
+        "Metadata. The server sees when and to which address a message arrived, its size and the sender checks.",
+        "Tampered site code. The app is loaded from our server. If the server is compromised, your browser could be served code that captures your password.",
+        "An infected device. Malware or a browser extension that can see the open tab can see your mail too.",
+        "A weak password. With a database dump, the password can be guessed offline. Argon2id makes every guess expensive, but only a long unique password really helps.",
+        "Your IP while you are connected. The server sees it, even though it does not store it. If that matters, connect through Tor or a VPN.",
+        "A forgotten password together with a lost phrase. Without them nobody can restore access or your mail, including us.",
+      ],
+    },
+    adversaries: {
+      title: "Who might attack and what they get",
+      whoLabel: "Who",
+      getsLabel: "What they get",
+      rows: [
+        {
+          who: "Outside attacker",
+          gets: "Guessing and phishing run into rate limits, proof-of-work and threat labels. Message HTML is shown in an isolated frame without scripts.",
+        },
+        {
+          who: "Owner of another account",
+          gets: "Nothing. Every request checks that the resource is yours, and someone else's looks like it does not exist.",
+        },
+        {
+          who: "Session thief",
+          gets: "The cookie is out of reach for scripts and holds no encryption keys. Deleting the account or a permanent address asks for the password again.",
+        },
+        {
+          who: "Database or backup leak",
+          gets: "Encrypted mail, encrypted keys, IP hashes and metadata. Mail stays unreadable without your password, but a weak password can be guessed.",
+        },
+        {
+          who: "Server operator",
+          gets: "Metadata and new messages at the moment they arrive. Stored mail stays closed to them without your password.",
+        },
+        {
+          who: "Spammer",
+          gets: "Every sign-up costs computation and runs into limits.",
+        },
+      ],
+    },
+    data: {
+      title: "What we store about you",
+      storedTitle: "Stored",
+      stored: [
+        "Your login. It is only used to sign in and is never shown to anyone.",
+        "A hash of your sign-in key and the salt for deriving keys.",
+        "Your public key and two encrypted copies of the private one.",
+        "Your addresses, their encrypted labels and folders.",
+        "Messages as ciphertext, plus arrival time, size and sender check results.",
+        "Sessions: browser and OS without details, dates to the day, an IP hash for 30 days at most.",
+      ],
+      neverTitle: "Never stored",
+      never: [
+        "Phone number, backup email, name.",
+        "Your password and recovery phrase.",
+        "Your IP address in the clear and the full User-Agent.",
+        "Analytics, trackers, third-party scripts and fonts.",
+      ],
+    },
+  },
 };
