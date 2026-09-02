@@ -30,7 +30,9 @@ export function proxy(request: NextRequest) {
 
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    // libsodium is WebAssembly; 'wasm-unsafe-eval' allows compiling it and nothing else
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""}`,
+    "worker-src 'self'",
     `style-src 'self' ${isDev ? "'unsafe-inline'" : `'nonce-${nonce}' 'unsafe-hashes' ${NEXT_IMAGE_STYLE_HASH}`}`,
     "img-src 'self' blob: data:",
     "font-src 'self'",

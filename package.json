@@ -11,6 +11,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@scure/bip39": "^2.4.0",
+    "libsodium-wrappers-sumo": "^0.8.4",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
