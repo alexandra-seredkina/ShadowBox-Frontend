@@ -1,4 +1,17 @@
 export const ru = {
+  common: {
+    loading: "Загрузка",
+    copy: "Копировать",
+    copied: "Скопировано",
+    copyFailed: "Не удалось",
+    showPassword: "Показать",
+    hidePassword: "Скрыть",
+  },
+  notFound: {
+    title: "Страница не найдена",
+    text: "Такой страницы нет. Возможно, ссылка устарела.",
+    home: "На главную",
+  },
   meta: {
     title: "ShadowBox — анонимная зашифрованная почта",
     description:

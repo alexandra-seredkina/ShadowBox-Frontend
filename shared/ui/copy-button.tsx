@@ -7,18 +7,14 @@ const RESET_AFTER_MS = 2000;
 
 type CopyState = "idle" | "copied" | "failed";
 
-const LABELS: Record<Exclude<CopyState, "idle">, string> = {
-  copied: "Скопировано",
-  failed: "Не удалось",
-};
-
 type CopyButtonProps = {
   readonly value: string;
-  readonly label?: string;
+  /** Texts from the i18n dictionary (`common.copy`, `common.copied`, `common.copyFailed`). */
+  readonly labels: { readonly copy: string; readonly copied: string; readonly failed: string };
   readonly variant?: ButtonVariant;
 };
 
-export function CopyButton({ value, label = "Копировать", variant = "ghost" }: CopyButtonProps): ReactElement {
+export function CopyButton({ value, labels, variant = "ghost" }: CopyButtonProps): ReactElement {
   const [state, setState] = useState<CopyState>("idle");
 
   useEffect(() => {
@@ -39,7 +35,7 @@ export function CopyButton({ value, label = "Копировать", variant = "g
 
   return (
     <Button variant={variant} onClick={() => void copy()} aria-live="polite">
-      {state === "idle" ? label : LABELS[state]}
+      {state === "idle" ? labels.copy : labels[state]}
     </Button>
   );
 }

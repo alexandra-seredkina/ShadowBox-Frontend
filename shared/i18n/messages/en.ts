@@ -1,6 +1,19 @@
 import type { Messages } from "./ru";
 
 export const en: Messages = {
+  common: {
+    loading: "Loading",
+    copy: "Copy",
+    copied: "Copied",
+    copyFailed: "Could not copy",
+    showPassword: "Show",
+    hidePassword: "Hide",
+  },
+  notFound: {
+    title: "Page not found",
+    text: "This page does not exist. The link may be out of date.",
+    home: "Go home",
+  },
   meta: {
     title: "ShadowBox — anonymous encrypted mail",
     description:

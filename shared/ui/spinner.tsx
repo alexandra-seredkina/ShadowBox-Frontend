@@ -1,10 +1,11 @@
 import type { ReactElement } from "react";
 
 type SpinnerProps = {
-  readonly label?: string;
+  /** Screen-reader text from the i18n dictionary (`common.loading`). */
+  readonly label: string;
 };
 
-export function Spinner({ label = "Загрузка" }: SpinnerProps): ReactElement {
+export function Spinner({ label }: SpinnerProps): ReactElement {
   return (
     <span role="status" className="inline-flex items-center">
       <svg viewBox="0 0 24 24" aria-hidden className="size-5 animate-spin text-red">
