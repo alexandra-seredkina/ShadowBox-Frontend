@@ -5,7 +5,7 @@ import { localizePath, type Locale } from "@/shared/i18n/locales";
 import { ButtonLink } from "@/shared/ui/button";
 import { Container } from "@/shared/ui/container";
 import { Logo } from "@/shared/ui/logo";
-import { LocaleSwitcher } from "./locale-switcher";
+import { LocaleSwitcher } from "@/shared/ui/locale-switcher";
 
 type SiteHeaderProps = {
   readonly locale: Locale;
