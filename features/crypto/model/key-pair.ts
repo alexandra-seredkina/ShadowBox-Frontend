@@ -21,12 +21,24 @@ export async function generateKeyPair(): Promise<KeyPair> {
   return { publicKey, privateKey };
 }
 
-/** XChaCha20-Poly1305 over the raw 32-byte X25519 private key, no associated data. */
+/**
+ * XChaCha20-Poly1305 over the raw 32-byte X25519 private key, no associated data (API.md §3).
+ * The nonce is a parameter only so the test vectors in API.md §11.3 can pin it.
+ */
+export async function encryptPrivateKeyWithNonce(params: {
+  readonly privateKey: Uint8Array;
+  readonly key: Uint8Array;
+  readonly nonce: Uint8Array;
+}): Promise<EncryptedKey> {
+  const sodium = await loadSodium();
+  const ciphertext = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(params.privateKey, null, null, params.nonce, params.key);
+  return { nonce: toBase64Url(sodium, params.nonce), ciphertext: toBase64Url(sodium, ciphertext) };
+}
+
 export async function encryptPrivateKey(privateKey: Uint8Array, key: Uint8Array): Promise<EncryptedKey> {
   const sodium = await loadSodium();
   const nonce = sodium.randombytes_buf(sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
-  const ciphertext = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(privateKey, null, null, nonce, key);
-  return { nonce: toBase64Url(sodium, nonce), ciphertext: toBase64Url(sodium, ciphertext) };
+  return encryptPrivateKeyWithNonce({ privateKey, key, nonce });
 }
 
 /** @throws DecryptionFailedError on a wrong key, which is what a wrong password looks like. */

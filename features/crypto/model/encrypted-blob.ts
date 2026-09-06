@@ -14,20 +14,36 @@ export const encryptedBlobSchema = z.strictObject({
 
 export type EncryptedBlob = z.infer<typeof encryptedBlobSchema>;
 
+type SealParams = {
+  readonly plaintext: Uint8Array;
+  readonly publicKey: Uint8Array;
+  readonly contentKey: Uint8Array;
+  readonly nonce: Uint8Array;
+};
+
+/**
+ * The content key and nonce are parameters only so the test vectors in API.md §11.4 can pin them;
+ * `sealedKey` still differs every time because `crypto_box_seal` uses an ephemeral key.
+ */
+export async function sealBlobWith({ plaintext, publicKey, contentKey, nonce }: SealParams): Promise<EncryptedBlob> {
+  const sodium = await loadSodium();
+  const ciphertext = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(plaintext, null, null, nonce, contentKey);
+  return {
+    v: 1,
+    alg: "x25519-xchacha20poly1305",
+    sealedKey: toBase64Url(sodium, sodium.crypto_box_seal(contentKey, publicKey)),
+    nonce: toBase64Url(sodium, nonce),
+    ciphertext: toBase64Url(sodium, ciphertext),
+  };
+}
+
 /** Random content key under XChaCha20-Poly1305; the key itself goes into `crypto_box_seal`. */
 export async function sealBlob(plaintext: Uint8Array, publicKey: Uint8Array): Promise<EncryptedBlob> {
   const sodium = await loadSodium();
   const contentKey = sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
   const nonce = sodium.randombytes_buf(sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
   try {
-    const ciphertext = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(plaintext, null, null, nonce, contentKey);
-    return {
-      v: 1,
-      alg: "x25519-xchacha20poly1305",
-      sealedKey: toBase64Url(sodium, sodium.crypto_box_seal(contentKey, publicKey)),
-      nonce: toBase64Url(sodium, nonce),
-      ciphertext: toBase64Url(sodium, ciphertext),
-    };
+    return await sealBlobWith({ plaintext, publicKey, contentKey, nonce });
   } finally {
     sodium.memzero(contentKey);
   }
