@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import type { ReactElement, ReactNode } from "react";
 import { AppGate } from "@/features/auth/ui/app-gate";
-import { MinimalHeader } from "@/features/auth/ui/minimal-header";
+import { AppHeader } from "@/features/auth/ui/app-header";
 import { isLocale } from "@/shared/i18n/locales";
 import { getMessages } from "@/shared/i18n/messages";
+import { ToastProvider } from "@/shared/ui/toast";
 
 type AppLayoutProps = {
   readonly children: ReactNode;
@@ -18,13 +19,20 @@ export default async function AppLayout({ children, params }: AppLayoutProps): P
   const messages = getMessages(locale);
 
   return (
-    <div className="grid min-h-dvh grid-rows-[auto_1fr]">
-      <MinimalHeader locale={locale} homeLabel={messages.auth.homeLabel} languageLabel={messages.header.languageLabel} />
-      <main id="content" className="px-4">
-        <AppGate locale={locale} loadingLabel={messages.common.loading} checkingText={messages.auth.app.checking}>
-          {children}
-        </AppGate>
-      </main>
-    </div>
+    <ToastProvider>
+      <div className="grid min-h-dvh grid-rows-[auto_1fr]">
+        <AppHeader
+          locale={locale}
+          messages={messages.appNav}
+          homeLabel={messages.auth.homeLabel}
+          languageLabel={messages.header.languageLabel}
+        />
+        <main id="content" className="px-4">
+          <AppGate locale={locale} loadingLabel={messages.common.loading} checkingText={messages.auth.app.checking}>
+            {children}
+          </AppGate>
+        </main>
+      </div>
+    </ToastProvider>
   );
 }

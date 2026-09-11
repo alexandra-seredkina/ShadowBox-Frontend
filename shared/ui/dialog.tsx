@@ -25,7 +25,12 @@ export function Dialog({ isOpen, onClose, title, description, children }: Dialog
   return (
     <dialog
       ref={dialogRef}
-      onClose={onClose}
+      // Escape fires `cancel`; the native `close` event would also fire when `isOpen` turns false,
+      // and reporting that back would undo whatever the parent just opened instead.
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
       className="m-auto w-[min(32rem,calc(100%-2rem))] rounded-card border border-line bg-surface p-6 text-paper backdrop:bg-night/80 backdrop:backdrop-blur-sm"
