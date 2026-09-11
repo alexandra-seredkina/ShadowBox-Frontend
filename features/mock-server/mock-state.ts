@@ -1,15 +1,19 @@
+import type { Alias } from "@/features/alias/api/alias-schemas";
+import type { Account, PowPurpose, RegisterResponse } from "@/features/auth/api/auth-schemas";
 import type { KdfParams } from "@/features/crypto/model/kdf";
 import type { EncryptedKey } from "@/features/crypto/model/key-pair";
-import type { Account, PowPurpose, RegisterResponse } from "./auth-schemas";
+import type { Folder } from "@/features/folder/api/folder-schemas";
 
-const STORAGE_KEY = "shadowbox-mock-auth";
+const STORAGE_KEY = "shadowbox-mock-server";
 
-type StoredAccount = {
+export type StoredAccount = {
   readonly authKey: string;
   readonly kdf: KdfParams;
   readonly publicKey: string;
   readonly encryptedPrivateKey: EncryptedKey;
   readonly account: Account;
+  aliases: Alias[];
+  folders: Folder[];
 };
 
 type StoredChallenge = {
@@ -24,14 +28,26 @@ type StoredChallenge = {
 export type MockState = {
   accounts: Record<string, StoredAccount>;
   challenges: Record<string, StoredChallenge>;
-  idempotency: Record<string, { readonly login: string; readonly response: RegisterResponse }>;
+  /** Idempotency-Key → original response, per endpoint. */
+  registerReplays: Record<string, { readonly login: string; readonly response: RegisterResponse }>;
+  aliasReplays: Record<string, Alias>;
   failures: Record<string, number>;
   /** Stands in for the HttpOnly session cookie. */
   sessionLogin: string | null;
+  /** Epoch milliseconds until which 🔒 actions are allowed. */
+  reauthUntil: number | null;
 };
 
 function emptyState(): MockState {
-  return { accounts: {}, challenges: {}, idempotency: {}, failures: {}, sessionLogin: null };
+  return {
+    accounts: {},
+    challenges: {},
+    registerReplays: {},
+    aliasReplays: {},
+    failures: {},
+    sessionLogin: null,
+    reauthUntil: null,
+  };
 }
 
 /** Outside a browser (unit tests) the mock server keeps its state in memory instead. */
@@ -61,4 +77,24 @@ export function saveMockState(state: MockState): void {
 export function resetMockState(): void {
   memoryCopy = null;
   if (typeof window !== "undefined") window.sessionStorage.removeItem(STORAGE_KEY);
+}
+
+/** `Account` as the server reports it: the active alias count is always current. */
+export function accountView(stored: StoredAccount): Account {
+  const activeAliases = stored.aliases.filter((alias) => alias.status === "active").length;
+  return { ...stored.account, limits: { ...stored.account.limits, activeAliases } };
+}
+
+/** The signed-in account, or null when the request would get 401 UNAUTHENTICATED. */
+export function findSessionAccount(state: MockState): StoredAccount | null {
+  return state.sessionLogin === null ? null : (state.accounts[state.sessionLogin] ?? null);
+}
+
+export function today(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/** Server-side ids are UUIDv7; the mock only needs them to be unique and unguessable. */
+export function newId(): string {
+  return crypto.randomUUID();
 }

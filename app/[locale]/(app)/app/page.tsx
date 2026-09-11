@@ -10,5 +10,5 @@ export default async function AppPage({ params }: AppPageProps): Promise<ReactEl
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <InboxPlaceholder locale={locale} messages={getMessages(locale).auth.app} />;
+  return <InboxPlaceholder messages={getMessages(locale).auth.app} />;
 }

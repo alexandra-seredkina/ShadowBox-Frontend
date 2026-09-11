@@ -1,5 +1,6 @@
 import type { KdfParams } from "@/features/crypto/model/kdf";
 import type { PowChallenge } from "@/features/crypto/pow/solve-pow";
+import { mockAuthApi } from "@/features/mock-server/mock-auth-api";
 import { selectApi } from "@/shared/api/client";
 import type {
   LoginRequest,
@@ -10,7 +11,6 @@ import type {
   SessionResponse,
 } from "./auth-schemas";
 import { httpAuthApi } from "./http-auth-api";
-import { mockAuthApi } from "./mock-auth-api";
 
 /** `/auth/*` from API.md §3. Every method rejects with `ApiError`. */
 export type AuthApi = {
@@ -20,6 +20,8 @@ export type AuthApi = {
   readonly login: (request: LoginRequest) => Promise<LoginResponse>;
   readonly logout: () => Promise<void>;
   readonly loadSession: () => Promise<SessionResponse>;
+  /** Opens the 5-minute window for 🔒 actions; the server rotates the session cookie. */
+  readonly reauth: (authKey: string) => Promise<void>;
 };
 
 export const authApi: AuthApi = selectApi({ http: httpAuthApi, mock: mockAuthApi });

@@ -24,4 +24,6 @@ export const httpAuthApi: AuthApi = {
   logout: () => requestEmpty("/auth/logout", { method: "POST", body: {} }),
 
   loadSession: () => requestJson("/auth/session", sessionResponseSchema),
+
+  reauth: (authKey) => requestEmpty("/auth/reauth", { method: "POST", body: { authKey } }),
 };

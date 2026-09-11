@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { encryptedBlobSchema } from "@/features/crypto/model/encrypted-blob";
+import { aliasSchema } from "@/features/alias/api/alias-schemas";
 import { kdfParamsSchema } from "@/features/crypto/model/kdf";
 import { encryptedKeySchema } from "@/features/crypto/model/key-pair";
 import type { PowSolution } from "@/features/crypto/pow/solve-pow";
@@ -28,21 +28,6 @@ export const keysSchema = z.object({
 });
 
 export type Keys = z.infer<typeof keysSchema>;
-
-/** API.md §6. */
-export const aliasSchema = z.object({
-  id: z.string(),
-  address: z.string(),
-  kind: z.enum(["permanent", "temporary"]),
-  status: z.enum(["active", "disabled"]),
-  encryptedLabel: encryptedBlobSchema.nullable(),
-  folderId: z.string().nullable(),
-  expiresAt: z.iso.datetime().nullable(),
-  createdAt: z.iso.date(),
-  lastReceivedAt: z.iso.date().nullable(),
-});
-
-export type Alias = z.infer<typeof aliasSchema>;
 
 export const preloginResponseSchema = z.object({ kdf: kdfParamsSchema });
 

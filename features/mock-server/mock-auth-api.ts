@@ -1,23 +1,29 @@
+import type { AuthApi } from "@/features/auth/api/auth-api";
+import type { Account, Keys, PowPurpose } from "@/features/auth/api/auth-schemas";
+import { findLoginIssue, normalizeLogin } from "@/features/auth/model/credentials";
 import { REGISTRATION_KDF, type KdfParams } from "@/features/crypto/model/kdf";
 import { fromBase64Url, loadSodium, toBase64Url } from "@/features/crypto/model/sodium";
 import { countLeadingZeroBits } from "@/features/crypto/pow/pow-search";
 import type { PowSolution } from "@/features/crypto/pow/solve-pow";
 import { mockFail, mockRespond } from "@/shared/api/mock-server";
-import { findLoginIssue, normalizeLogin } from "../model/credentials";
-import type { AuthApi } from "./auth-api";
-import type { Account, Alias, Keys, PowPurpose } from "./auth-schemas";
-import { loadMockState, saveMockState, type MockState } from "./mock-auth-state";
+import { newAlias, systemFolders } from "./mock-records";
+import {
+  accountView,
+  findSessionAccount,
+  loadMockState,
+  saveMockState,
+  today,
+  type MockState,
+  type StoredAccount,
+} from "./mock-state";
 
 const POW_DIFFICULTY = 20;
 const POW_TTL_MS = 5 * 60 * 1000;
+const REAUTH_WINDOW_MS = 5 * 60 * 1000;
 const POW_REQUIRED_AFTER = 5;
 const LOCKED_AFTER = 10;
 const LOCK_SECONDS = 15 * 60;
 const RESERVED_LOGINS = new Set(["admin", "abuse", "postmaster", "security", "support", "noreply", "root"]);
-
-function today(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function invalidLogin(raw: string): Promise<never> | null {
   const issue = findLoginIssue(raw);
@@ -46,24 +52,13 @@ function newAccount(login: string): Account {
   };
 }
 
-function newAlias(): Alias {
-  const localPart = crypto.randomUUID().replaceAll("-", "").slice(0, 10);
-  return {
-    id: crypto.randomUUID(),
-    address: `${localPart}@shadowbox.test`,
-    kind: "permanent",
-    status: "active",
-    encryptedLabel: null,
-    folderId: null,
-    expiresAt: null,
-    createdAt: today(),
-    lastReceivedAt: null,
-  };
+function keysOf(stored: StoredAccount): Keys {
+  return { publicKey: stored.publicKey, encryptedPrivateKey: stored.encryptedPrivateKey, kdf: stored.kdf };
 }
 
-function keysOf(state: MockState, login: string): Keys | null {
-  const stored = state.accounts[login];
-  return stored ? { publicKey: stored.publicKey, encryptedPrivateKey: stored.encryptedPrivateKey, kdf: stored.kdf } : null;
+function startSession(state: MockState, login: string): void {
+  state.sessionLogin = login;
+  state.reauthUntil = null;
 }
 
 /**
@@ -106,9 +101,9 @@ export const mockAuthApi: AuthApi = {
     if (RESERVED_LOGINS.has(login)) return mockFail({ status: 422, code: "LOGIN_RESERVED" });
 
     const state = loadMockState();
-    const replay = state.idempotency[idempotencyKey];
+    const replay = state.registerReplays[idempotencyKey];
     if (replay) {
-      state.sessionLogin = replay.login;
+      startSession(state, replay.login);
       saveMockState(state);
       return mockRespond(replay.response);
     }
@@ -117,16 +112,18 @@ export const mockAuthApi: AuthApi = {
     if (!isPowOk) return mockFail({ status: 400, code: "POW_INVALID" });
     if (state.accounts[login]) return mockFail({ status: 409, code: "LOGIN_TAKEN" });
 
-    const response = { account: newAccount(login), firstAlias: newAlias() };
+    const response = { account: newAccount(login), firstAlias: newAlias({ kind: "permanent", ttl: null }) };
     state.accounts[login] = {
       authKey: request.authKey,
       kdf: request.kdf,
       publicKey: request.keys.publicKey,
       encryptedPrivateKey: request.keys.encryptedPrivateKey,
       account: response.account,
+      aliases: [response.firstAlias],
+      folders: systemFolders(),
     };
-    state.idempotency[idempotencyKey] = { login, response };
-    state.sessionLogin = login;
+    state.registerReplays[idempotencyKey] = { login, response };
+    startSession(state, login);
     saveMockState(state);
     return mockRespond(response, 600);
   },
@@ -146,31 +143,41 @@ export const mockAuthApi: AuthApi = {
     }
 
     const stored = state.accounts[login];
-    const keys = keysOf(state, login);
-    if (!stored || !keys || stored.authKey !== request.authKey) {
+    if (!stored || stored.authKey !== request.authKey) {
       state.failures[login] = failures + 1;
       saveMockState(state);
       return mockFail({ status: 401, code: "INVALID_CREDENTIALS", latencyMs: 600 });
     }
     delete state.failures[login];
-    state.sessionLogin = login;
+    startSession(state, login);
     saveMockState(state);
-    return mockRespond({ account: stored.account, keys }, 600);
+    return mockRespond({ account: accountView(stored), keys: keysOf(stored) }, 600);
   },
 
   async logout() {
     const state = loadMockState();
     state.sessionLogin = null;
+    state.reauthUntil = null;
     saveMockState(state);
     return mockRespond(undefined);
   },
 
   async loadSession() {
     const state = loadMockState();
-    const login = state.sessionLogin;
-    const stored = login === null ? undefined : state.accounts[login];
-    const keys = login === null ? null : keysOf(state, login);
-    if (!stored || !keys) return mockFail({ status: 401, code: "UNAUTHENTICATED" });
-    return mockRespond({ account: stored.account, keys, session: { id: "mock-session", reauthUntil: null } });
+    const stored = findSessionAccount(state);
+    if (!stored) return mockFail({ status: 401, code: "UNAUTHENTICATED" });
+    const reauthUntil =
+      state.reauthUntil !== null && state.reauthUntil > Date.now() ? new Date(state.reauthUntil).toISOString() : null;
+    return mockRespond({ account: accountView(stored), keys: keysOf(stored), session: { id: "mock-session", reauthUntil } });
+  },
+
+  async reauth(authKey) {
+    const state = loadMockState();
+    const stored = findSessionAccount(state);
+    if (!stored) return mockFail({ status: 401, code: "UNAUTHENTICATED" });
+    if (stored.authKey !== authKey) return mockFail({ status: 401, code: "INVALID_CREDENTIALS", latencyMs: 600 });
+    state.reauthUntil = Date.now() + REAUTH_WINDOW_MS;
+    saveMockState(state);
+    return mockRespond(undefined, 600);
   },
 };

@@ -6,7 +6,7 @@ import { searchPowNonce } from "@/features/crypto/pow/pow-search";
 import type { PowChallenge, PowSolution } from "@/features/crypto/pow/solve-pow";
 import { ApiError } from "@/shared/api/api-error";
 import { authApi } from "../api/auth-api";
-import { loadMockState, resetMockState, saveMockState } from "../api/mock-auth-state";
+import { loadMockState, resetMockState, saveMockState } from "@/features/mock-server/mock-state";
 import { completeRegistration, prepareRegistration } from "./register";
 import { signIn, signOut, unlock } from "./sign-in";
 
