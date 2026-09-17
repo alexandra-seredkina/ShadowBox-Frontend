@@ -83,7 +83,7 @@ function AliasList({ locale, messages, aliases, folders, dialogs }: AliasListPro
       )}
 
       <AliasFormDialog
-        key={dialog?.kind === "create" ? dialog.idempotencyKey : (editing?.alias.id ?? "closed")}
+        key={dialog?.kind === "create" ? dialog.idempotencyKey : (editing?.alias.id ?? "form-closed")}
         mode={editing ? "edit" : "create"}
         isOpen={dialog?.kind === "create" || editing !== null}
         initial={{ label: editing ? labelText(editing) : "", folderId: editing?.alias.folderId ?? null }}
@@ -93,7 +93,7 @@ function AliasList({ locale, messages, aliases, folders, dialogs }: AliasListPro
         onSubmit={dialogs.submitForm}
       />
       <RevokeAliasDialog
-        key={revoking?.alias.id ?? "closed"}
+        key={revoking ? `revoke-${revoking.alias.id}` : "revoke-closed"}
         isOpen={dialog?.kind === "revoke"}
         address={revoking?.alias.address ?? ""}
         messages={text.revoke}

@@ -238,8 +238,6 @@ export const de: Messages = {
       cancel: "Abbrechen",
     },
     app: {
-      title: "Dein Postfach ist bereit",
-      text: "Nachrichten und Ordner erscheinen hier in den nächsten Versionen, Adressen kannst du schon unter „Adressen“ erstellen. Dein Schlüssel ist entsperrt und lebt nur in diesem Tab.",
       checking: "Sitzung wird geprüft…",
     },
   },
@@ -247,6 +245,37 @@ export const de: Messages = {
   folders: {
     system: { inbox: "Posteingang", spam: "Spam", trash: "Papierkorb" },
     unreadable: "Ordner ohne Namen",
+    sidebarLabel: "Ordner",
+    loading: "Ordner werden geladen…",
+    create: "Neuer Ordner",
+    unread: "{count} ungelesen",
+    actions: { rename: "Umbenennen", delete: "Löschen" },
+    form: {
+      createTitle: "Neuer Ordner",
+      renameTitle: "Ordner umbenennen",
+      nameField: "Name",
+      nameHint: "Nur du siehst ihn: Der Name wird in deinem Browser verschlüsselt.",
+      nameRequired: "Gib einen Namen ein.",
+      nameTooLong: "Der Name ist länger als {max} Zeichen.",
+      submitCreate: "Erstellen",
+      submitRename: "Speichern",
+      saving: "Wird gespeichert…",
+      cancel: "Abbrechen",
+    },
+    delete: {
+      title: "Ordner „{name}“ löschen?",
+      text: "Seine Nachrichten wandern in den Posteingang, ebenso Adressen, die ihre Post hierher gelegt haben. Der Ordner selbst verschwindet.",
+      confirm: "Löschen",
+      cancel: "Abbrechen",
+    },
+    toasts: { created: "Ordner erstellt", renamed: "Ordner umbenannt", deleted: "Ordner gelöscht" },
+    errors: {
+      FOLDER_LIMIT_EXCEEDED: "Du hast das Limit von 50 eigenen Ordnern erreicht.",
+      FOLDER_IS_SYSTEM: "Systemordner lassen sich nicht umbenennen oder löschen.",
+      NOT_FOUND: "Ordner nicht gefunden. Lade die Seite neu.",
+    },
+    empty: { title: "Noch keine Nachrichten", text: "Wenn Post an deine Adressen kommt, erscheint sie hier." },
+    missing: { title: "Diesen Ordner gibt es nicht", text: "Vielleicht wurde er gelöscht.", back: "Zum Posteingang" },
   },
   aliasesPage: {
     metaTitle: "Adressen",
@@ -298,6 +327,7 @@ export const de: Messages = {
     errors: {
       ALIAS_LIMIT_EXCEEDED: "Du hast das Limit aktiver Adressen erreicht. Schalte eine aus oder lösch eine, die du nicht brauchst.",
       NOT_FOUND: "Adresse oder Ordner nicht gefunden. Lade die Seite neu.",
+      IDEMPOTENCY_CONFLICT: "Diese Anfrage wurde schon mit anderen Daten gesendet. Schließ das Formular und erstell die Adresse neu.",
     },
   },
   securityPage: {

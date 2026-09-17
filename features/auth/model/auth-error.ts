@@ -32,6 +32,18 @@ export function describeAuthError(error: unknown, messages: ErrorMessages): stri
   return messages.unknown;
 }
 
+/** Codes of one resource first (e.g. `/aliases`), then the common ones shared with `/auth`. */
+export function describeErrorWith(
+  error: unknown,
+  messages: { readonly specific: Readonly<Record<string, string>>; readonly common: ErrorMessages },
+): string {
+  if (error instanceof ApiError && Object.hasOwn(messages.specific, error.code)) {
+    const text = messages.specific[error.code];
+    if (text !== undefined) return text;
+  }
+  return describeAuthError(error, messages.common);
+}
+
 const LOGIN_REJECTION_CODES: ReadonlySet<string> = new Set(["LOGIN_TAKEN", "LOGIN_RESERVED"]);
 
 /** The server refused the login itself: the user has to pick another one. */

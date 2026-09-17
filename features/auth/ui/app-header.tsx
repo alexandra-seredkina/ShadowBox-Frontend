@@ -24,8 +24,8 @@ export function AppHeader({ locale, messages, homeLabel, languageLabel }: AppHea
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const links = [
-    { href: localizePath(locale, "/app"), label: messages.inbox },
-    { href: localizePath(locale, "/app/aliases"), label: messages.aliases },
+    { href: localizePath(locale, "/app/f/inbox"), section: localizePath(locale, "/app/f/"), label: messages.inbox },
+    { href: localizePath(locale, "/app/aliases"), section: localizePath(locale, "/app/aliases"), label: messages.aliases },
   ];
 
   async function leave(): Promise<void> {
@@ -43,20 +43,23 @@ export function AppHeader({ locale, messages, homeLabel, languageLabel }: AppHea
         </Link>
         <nav aria-label={messages.label} className="mr-auto">
           <ul className="flex gap-1 text-sm">
-            {links.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  aria-current={pathname === link.href ? "page" : undefined}
-                  className={joinClassNames(
-                    "block rounded-control px-3 py-2 transition-colors",
-                    pathname === link.href ? "bg-surface-2 text-paper" : "text-fog hover:text-paper",
-                  )}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+            {links.map((link) => {
+              const isCurrent = pathname.startsWith(link.section);
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    aria-current={isCurrent ? "page" : undefined}
+                    className={joinClassNames(
+                      "block rounded-control px-3 py-2 transition-colors",
+                      isCurrent ? "bg-surface-2 text-paper" : "text-fog hover:text-paper",
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
         <LocaleSwitcher current={locale} label={languageLabel} />

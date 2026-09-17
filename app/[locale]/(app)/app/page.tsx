@@ -1,14 +1,10 @@
-import { notFound } from "next/navigation";
-import type { ReactElement } from "react";
-import { InboxPlaceholder } from "@/features/auth/ui/inbox-placeholder";
-import { isLocale } from "@/shared/i18n/locales";
-import { getMessages } from "@/shared/i18n/messages";
+import { notFound, redirect } from "next/navigation";
+import { isLocale, localizePath } from "@/shared/i18n/locales";
 
 type AppPageProps = { readonly params: Promise<{ locale: string }> };
 
-export default async function AppPage({ params }: AppPageProps): Promise<ReactElement> {
+export default async function AppPage({ params }: AppPageProps): Promise<never> {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-
-  return <InboxPlaceholder messages={getMessages(locale).auth.app} />;
+  redirect(localizePath(locale, "/app/f/inbox"));
 }

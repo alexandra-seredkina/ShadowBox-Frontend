@@ -230,8 +230,6 @@ export const en: Messages = {
       cancel: "Cancel",
     },
     app: {
-      title: "Your inbox is ready",
-      text: "Messages and folders will show up here in the next versions; addresses can already be created under “Addresses”. Your key is unlocked and lives only in this tab.",
       checking: "Checking your session…",
     },
   },
@@ -239,6 +237,37 @@ export const en: Messages = {
   folders: {
     system: { inbox: "Inbox", spam: "Spam", trash: "Trash" },
     unreadable: "Unnamed folder",
+    sidebarLabel: "Folders",
+    loading: "Loading folders…",
+    create: "New folder",
+    unread: "{count} unread",
+    actions: { rename: "Rename", delete: "Delete" },
+    form: {
+      createTitle: "New folder",
+      renameTitle: "Rename folder",
+      nameField: "Name",
+      nameHint: "Only you see it: the name is encrypted in your browser.",
+      nameRequired: "Enter a name.",
+      nameTooLong: "The name is longer than {max} characters.",
+      submitCreate: "Create",
+      submitRename: "Save",
+      saving: "Saving…",
+      cancel: "Cancel",
+    },
+    delete: {
+      title: "Delete the folder “{name}”?",
+      text: "Its messages move to the Inbox, and so do addresses that delivered mail here. The folder itself disappears.",
+      confirm: "Delete",
+      cancel: "Cancel",
+    },
+    toasts: { created: "Folder created", renamed: "Folder renamed", deleted: "Folder deleted" },
+    errors: {
+      FOLDER_LIMIT_EXCEEDED: "You've reached the limit of 50 custom folders.",
+      FOLDER_IS_SYSTEM: "System folders can't be renamed or deleted.",
+      NOT_FOUND: "The folder was not found. Reload the page.",
+    },
+    empty: { title: "No messages yet", text: "When mail arrives at your addresses, it shows up here." },
+    missing: { title: "No such folder", text: "It may have been deleted.", back: "Go to Inbox" },
   },
   aliasesPage: {
     metaTitle: "Addresses",
@@ -290,6 +319,7 @@ export const en: Messages = {
     errors: {
       ALIAS_LIMIT_EXCEEDED: "You've reached the limit of active addresses. Turn off or delete one you don't need.",
       NOT_FOUND: "The address or folder was not found. Reload the page.",
+      IDEMPOTENCY_CONFLICT: "This request was already sent with different data. Close the form and create the address again.",
     },
   },
   securityPage: {

@@ -30,7 +30,7 @@ export type MockState = {
   challenges: Record<string, StoredChallenge>;
   /** Idempotency-Key → original response, per endpoint. */
   registerReplays: Record<string, { readonly login: string; readonly response: RegisterResponse }>;
-  aliasReplays: Record<string, Alias>;
+  aliasReplays: Record<string, { readonly request: string; readonly alias: Alias }>;
   failures: Record<string, number>;
   /** Stands in for the HttpOnly session cookie. */
   sessionLogin: string | null;

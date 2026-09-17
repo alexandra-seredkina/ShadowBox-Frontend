@@ -19,6 +19,12 @@ function hasFolder(stored: StoredAccount, folderId: string | null | undefined): 
   return folderId === null || folderId === undefined || stored.folders.some((folder) => folder.id === folderId);
 }
 
+/** API.md §6: only `active` addresses count towards the limit. */
+function isAtActiveLimit(stored: StoredAccount): boolean {
+  const { activeAliases, maxActiveAliases } = accountView(stored).limits;
+  return activeAliases >= maxActiveAliases;
+}
+
 const unauthenticated = (): Promise<never> => mockFail({ status: 401, code: "UNAUTHENTICATED" });
 const notFound = (): Promise<never> => mockFail({ status: 404, code: "NOT_FOUND" });
 
@@ -36,10 +42,13 @@ export const mockAliasApi: AliasApi = {
     if (!session) return unauthenticated();
     const { state, stored } = session;
     const replay = state.aliasReplays[idempotencyKey];
-    if (replay) return mockRespond(replay);
+    if (replay) {
+      return replay.request === JSON.stringify(request)
+        ? mockRespond(replay.alias)
+        : mockFail({ status: 409, code: "IDEMPOTENCY_CONFLICT" });
+    }
     if (!hasFolder(stored, request.folderId)) return notFound();
-    const { activeAliases, maxActiveAliases } = accountView(stored).limits;
-    if (activeAliases >= maxActiveAliases) return mockFail({ status: 422, code: "ALIAS_LIMIT_EXCEEDED" });
+    if (isAtActiveLimit(stored)) return mockFail({ status: 422, code: "ALIAS_LIMIT_EXCEEDED" });
 
     const alias = newAlias({
       kind: request.kind,
@@ -48,7 +57,7 @@ export const mockAliasApi: AliasApi = {
       folderId: request.folderId,
     });
     stored.aliases.unshift(alias);
-    state.aliasReplays[idempotencyKey] = alias;
+    state.aliasReplays[idempotencyKey] = { request: JSON.stringify(request), alias };
     saveMockState(state);
     return mockRespond(alias);
   },
@@ -59,6 +68,8 @@ export const mockAliasApi: AliasApi = {
     const index = session.stored.aliases.findIndex((alias) => alias.id === id);
     const current = session.stored.aliases[index];
     if (!current || !hasFolder(session.stored, request.folderId)) return notFound();
+    const isEnabling = request.status === "active" && current.status === "disabled";
+    if (isEnabling && isAtActiveLimit(session.stored)) return mockFail({ status: 422, code: "ALIAS_LIMIT_EXCEEDED" });
     const updated: Alias = { ...current, ...request };
     session.stored.aliases[index] = updated;
     saveMockState(session.state);

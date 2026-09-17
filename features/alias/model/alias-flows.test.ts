@@ -1,66 +1,43 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { completeRegistration, prepareRegistration } from "@/features/auth/model/register";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { reauthenticate } from "@/features/auth/model/reauth";
-import { getUnlockedKeys, lockKeys } from "@/features/crypto/model/key-store";
-import { fromBase64Url, loadSodium } from "@/features/crypto/model/sodium";
-import { searchPowNonce } from "@/features/crypto/pow/pow-search";
-import type { PowChallenge, PowSolution } from "@/features/crypto/pow/solve-pow";
+import type { KeyPair } from "@/features/crypto/model/key-pair";
+import { lockKeys } from "@/features/crypto/model/key-store";
 import { folderApi } from "@/features/folder/api/folder-api";
 import { loadMockState, resetMockState, saveMockState } from "@/features/mock-server/mock-state";
+import {
+  registerTestAccount,
+  snapshotMockServer,
+  TEST_PASSWORD,
+} from "@/features/mock-server/testing/register-test-account";
 import { aliasApi } from "../api/alias-api";
 import { sealAliasLabel, toAliasView } from "./alias-view";
 
 vi.mock("@/shared/config/public-env", () => ({ publicEnv: { apiMode: "mock" } }));
+vi.mock("@/shared/api/mock-server", () => import("@/features/mock-server/testing/instant-mock-server"));
+vi.mock("@/features/crypto/pow/solve-pow", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  ...(await import("@/features/mock-server/testing/inline-solve-pow")),
+}));
 
-vi.mock("@/shared/api/mock-server", async () => {
-  const errors = await import("@/shared/api/api-error");
-  return {
-    mockRespond: async <T>(value: T): Promise<T> => structuredClone(value),
-    mockFail: async (failure: { status: number; code: string }): Promise<never> => {
-      throw new errors.ApiError(failure);
-    },
-  };
-});
+let keyPair: KeyPair;
+let restoreMockServer: () => void;
+const keys = (): KeyPair => keyPair;
 
-vi.mock("@/features/crypto/pow/solve-pow", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@/features/crypto/pow/solve-pow")>();
-  return {
-    ...original,
-    solvePow: async (challenge: PowChallenge): Promise<PowSolution> => {
-      const sodium = await loadSodium();
-      const nonce = searchPowNonce({
-        prefix: fromBase64Url(sodium, challenge.prefix),
-        difficulty: challenge.difficulty,
-        start: 0,
-        attempts: 2 ** 26,
-        sha256: (message) => sodium.crypto_hash_sha256(message),
-      });
-      if (nonce === null) throw new Error("no nonce");
-      return { challengeId: challenge.challengeId, nonce };
-    },
-  };
-});
-
-const PASSWORD = "correct horse battery staple";
-const noProgress = (): void => undefined;
-
-function keys() {
-  const unlocked = getUnlockedKeys();
-  if (unlocked === null) throw new Error("locked");
-  return unlocked;
-}
-
-beforeEach(async () => {
+beforeAll(async () => {
   resetMockState();
-  const { prepared, ticket } = await prepareRegistration({ login: "kage", password: PASSWORD, onProgress: noProgress });
-  await completeRegistration({ prepared, ticket, onPowProgress: noProgress });
+  keyPair = await registerTestAccount("kage");
+  restoreMockServer = snapshotMockServer();
 });
 
-afterEach(async () => {
+beforeEach(() => {
+  restoreMockServer();
+});
+
+afterAll(async () => {
   await lockKeys();
 });
 
-describe("aliases on the mock API", { timeout: 20_000 }, () => {
+describe("aliases on the mock API", () => {
   it("starts with the permanent address created at sign-up and three system folders", async () => {
     const aliases = await aliasApi.listAliases();
     const folders = await folderApi.listFolders();
@@ -90,6 +67,24 @@ describe("aliases on the mock API", { timeout: 20_000 }, () => {
     expect(await aliasApi.listAliases()).toHaveLength(2);
   });
 
+  it("rejects the same Idempotency-Key with a different body", async () => {
+    await aliasApi.createAlias({ kind: "permanent", encryptedLabel: null, folderId: null }, "key-1");
+
+    const other = aliasApi.createAlias({ kind: "temporary", ttl: "1h", encryptedLabel: null, folderId: null }, "key-1");
+
+    await expect(other).rejects.toMatchObject({ code: "IDEMPOTENCY_CONFLICT" });
+  });
+
+  it("does not turn an address back on above the active limit", async () => {
+    const [firstAlias] = await aliasApi.listAliases();
+    const id = firstAlias?.id ?? "";
+    await aliasApi.updateAlias(id, { status: "disabled" });
+    const request = { kind: "temporary", ttl: "24h", encryptedLabel: null, folderId: null } as const;
+    for (let index = 0; index < 20; index += 1) await aliasApi.createAlias(request, `key-${index}`);
+
+    await expect(aliasApi.updateAlias(id, { status: "active" })).rejects.toMatchObject({ code: "ALIAS_LIMIT_EXCEEDED" });
+  });
+
   it("rejects an unknown folder as NOT_FOUND", async () => {
     const request = { kind: "permanent", encryptedLabel: null, folderId: "someone-elses" } as const;
 
@@ -108,7 +103,7 @@ describe("aliases on the mock API", { timeout: 20_000 }, () => {
     const id = firstAlias?.id ?? "";
 
     await expect(aliasApi.revokeAlias(id)).rejects.toMatchObject({ code: "REAUTH_REQUIRED" });
-    await reauthenticate(PASSWORD);
+    await reauthenticate(TEST_PASSWORD);
     await aliasApi.revokeAlias(id);
 
     expect(await aliasApi.listAliases()).toEqual([]);
