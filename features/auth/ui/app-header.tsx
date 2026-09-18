@@ -26,6 +26,7 @@ export function AppHeader({ locale, messages, homeLabel, languageLabel }: AppHea
   const links = [
     { href: localizePath(locale, "/app/f/inbox"), section: localizePath(locale, "/app/f/"), label: messages.inbox },
     { href: localizePath(locale, "/app/aliases"), section: localizePath(locale, "/app/aliases"), label: messages.aliases },
+    { href: localizePath(locale, "/app/settings"), section: localizePath(locale, "/app/settings"), label: messages.settings },
   ];
 
   async function leave(): Promise<void> {
@@ -37,11 +38,12 @@ export function AppHeader({ locale, messages, homeLabel, languageLabel }: AppHea
 
   return (
     <header className="border-b border-line">
-      <Container className="flex h-16 items-center gap-3 sm:gap-6">
-        <Link href={localizePath(locale, "/")} aria-label={homeLabel} className="rounded-control">
+      <Container className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3 sm:h-16 sm:flex-nowrap sm:gap-6 sm:py-0">
+        <Link href={localizePath(locale, "/")} aria-label={homeLabel} className="mr-auto rounded-control sm:mr-0">
           <Logo variant="mark" />
         </Link>
-        <nav aria-label={messages.label} className="mr-auto">
+        {/* Phones get the sections as a second row, so the header never widens the page. */}
+        <nav aria-label={messages.label} className="order-last w-full sm:order-none sm:mr-auto sm:w-auto">
           <ul className="flex gap-1 text-sm">
             {links.map((link) => {
               const isCurrent = pathname.startsWith(link.section);

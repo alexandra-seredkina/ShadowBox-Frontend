@@ -11,7 +11,7 @@ export type StoredAccount = {
   readonly kdf: KdfParams;
   readonly publicKey: string;
   readonly encryptedPrivateKey: EncryptedKey;
-  readonly account: Account;
+  account: Account;
   aliases: Alias[];
   folders: Folder[];
 };
