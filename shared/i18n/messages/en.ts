@@ -307,6 +307,8 @@ export const en: Messages = {
     loadMore: "Show older messages",
     loadingMore: "Loading older messages…",
     end: "That's all the mail in this folder.",
+    searchPlaceholder: "Search previews…",
+    noResults: "No messages match this search.",
     errors: { NOT_FOUND: "The folder or message is gone. Reload the page." },
     empty: {
       inbox: { title: "No messages yet", text: "Give one of your addresses to a site, and its mail shows up here." },

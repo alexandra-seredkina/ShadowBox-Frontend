@@ -9,10 +9,12 @@ import type { Locale } from "@/shared/i18n/locales";
 import { useToast } from "@/shared/ui/toast";
 import type { MessageChange } from "../model/message-row";
 import type { MessageList, MessageListState } from "../model/use-message-list";
+import { useMessageSearch } from "../model/use-message-search";
 import { DeleteMessagesDialog } from "./delete-messages-dialog";
 import { LoadMore } from "./load-more";
 import type { MailMessages } from "./mail-messages";
 import { MessageListItem } from "./message-list-item";
+import { MessageSearch } from "./message-search";
 import { MessageToolbar } from "./message-toolbar";
 import { useSelection } from "./use-selection";
 
@@ -27,7 +29,9 @@ type MessageRowsProps = {
 
 export function MessageRows({ list, state, folder, folders, locale, messages }: MessageRowsProps): ReactElement {
   const text = messages.mail;
-  const selection = useSelection(state.rows.map((row) => row.summary.id));
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredRows = useMessageSearch(state.rows, searchQuery);
+  const selection = useSelection(filteredRows.map((row) => row.summary.id));
   const showToast = useToast();
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,18 +73,28 @@ export function MessageRows({ list, state, folder, folders, locale, messages }: 
         onDeleteForever={() => setIsDeleteOpen(true)}
       />
       <FormError message={error} />
-      <ul aria-label={text.listLabel} className="-mx-2 sm:-mx-3">
-        {state.rows.map((row) => (
-          <MessageListItem
-            key={row.summary.id}
-            row={row}
-            locale={locale}
-            messages={text}
-            isSelected={selection.has(row.summary.id)}
-            onToggle={() => selection.toggle(row.summary.id)}
-          />
-        ))}
-      </ul>
+      <MessageSearch
+        query={searchQuery}
+        onQueryChange={setSearchQuery}
+        placeholder={text.searchPlaceholder}
+        count={filteredRows.length}
+      />
+      {filteredRows.length === 0 && searchQuery ? (
+        <p className="py-8 text-center text-sm text-fog">{text.noResults}</p>
+      ) : (
+        <ul aria-label={text.listLabel} className="-mx-2 sm:-mx-3">
+          {filteredRows.map((row) => (
+            <MessageListItem
+              key={row.summary.id}
+              row={row}
+              locale={locale}
+              messages={text}
+              isSelected={selection.has(row.summary.id)}
+              onToggle={() => selection.toggle(row.summary.id)}
+            />
+          ))}
+        </ul>
+      )}
       {state.loadMoreError ? <FormError message={describe(state.loadMoreError)} /> : null}
       {state.nextCursor === null ? (
         <p className="py-6 text-center text-sm text-fog">{text.end}</p>

@@ -315,6 +315,8 @@ export const de: Messages = {
     loadMore: "Ältere Nachrichten zeigen",
     loadingMore: "Ältere Nachrichten werden geladen…",
     end: "Das ist die ganze Post in diesem Ordner.",
+    searchPlaceholder: "Vorschau durchsuchen…",
+    noResults: "Keine Nachrichten passen zu dieser Suche.",
     errors: { NOT_FOUND: "Der Ordner oder die Nachricht ist weg. Lade die Seite neu." },
     empty: {
       inbox: { title: "Noch keine Nachrichten", text: "Gib einer Website eine deiner Adressen, dann erscheint ihre Post hier." },
