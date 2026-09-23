@@ -18,6 +18,8 @@ export type Folders = {
   readonly create: (name: string) => Promise<FolderOption>;
   readonly rename: (folder: FolderOption, name: string) => Promise<void>;
   readonly remove: (folder: FolderOption) => Promise<void>;
+  /** Mail actions already know how counts change; this saves a refetch of the folder list. */
+  readonly adjustUnread: (delta: ReadonlyMap<string, number>) => void;
 };
 
 function requireKeys(): KeyPair {
@@ -78,10 +80,26 @@ export function useFolders(): Folders {
 
   const remove = useCallback(async (folder: FolderOption) => {
     await folderApi.deleteFolder(folder.id);
-    setState((current) =>
-      current.kind === "ready" ? { kind: "ready", folders: current.folders.filter((item) => item.id !== folder.id) } : current,
-    );
+    // The server moves the folder's mail to the inbox, unread messages included.
+    setState((current) => {
+      if (current.kind !== "ready") return current;
+      const folders = current.folders
+        .filter((item) => item.id !== folder.id)
+        .map((item) => (item.systemRole === "inbox" ? { ...item, unreadCount: item.unreadCount + folder.unreadCount } : item));
+      return { kind: "ready", folders };
+    });
   }, []);
 
-  return { state, create, rename, remove };
+  const adjustUnread = useCallback((delta: ReadonlyMap<string, number>) => {
+    setState((current) => {
+      if (current.kind !== "ready") return current;
+      const folders = current.folders.map((folder) => {
+        const change = delta.get(folder.id) ?? 0;
+        return change === 0 ? folder : { ...folder, unreadCount: Math.max(0, folder.unreadCount + change) };
+      });
+      return { kind: "ready", folders };
+    });
+  }, []);
+
+  return { state, create, rename, remove, adjustUnread };
 }

@@ -14,6 +14,12 @@ function openSession(): Session | null {
   return stored ? { state, stored } : null;
 }
 
+/** `unreadCount` is always current, as the server counts it per request. */
+function withUnreadCount(stored: StoredAccount, folder: Folder): Folder {
+  const unreadCount = stored.messages.filter((message) => message.folderId === folder.id && !message.isRead).length;
+  return { ...folder, unreadCount };
+}
+
 const unauthenticated = (): Promise<never> => mockFail({ status: 401, code: "UNAUTHENTICATED" });
 const notFound = (): Promise<never> => mockFail({ status: 404, code: "NOT_FOUND" });
 const isSystem = (): Promise<never> => mockFail({ status: 422, code: "FOLDER_IS_SYSTEM" });
@@ -23,7 +29,8 @@ export const mockFolderApi: FolderApi = {
   async listFolders() {
     const session = openSession();
     if (!session) return unauthenticated();
-    return mockRespond(session.stored.folders);
+    const { stored } = session;
+    return mockRespond(stored.folders.map((folder) => withUnreadCount(stored, folder)));
   },
 
   async createFolder(encryptedName) {
@@ -46,7 +53,7 @@ export const mockFolderApi: FolderApi = {
     const renamed: Folder = { ...folder, encryptedName };
     session.stored.folders = session.stored.folders.map((candidate) => (candidate.id === id ? renamed : candidate));
     saveMockState(session.state);
-    return mockRespond(renamed);
+    return mockRespond(withUnreadCount(session.stored, renamed));
   },
 
   async deleteFolder(id) {
@@ -56,7 +63,11 @@ export const mockFolderApi: FolderApi = {
     const folder = stored.folders.find((candidate) => candidate.id === id);
     if (!folder) return notFound();
     if (folder.kind === "system") return isSystem();
+    const inbox = stored.folders.find((candidate) => candidate.systemRole === "inbox");
     stored.folders = stored.folders.filter((candidate) => candidate.id !== id);
+    if (inbox) {
+      stored.messages = stored.messages.map((message) => (message.folderId === id ? { ...message, folderId: inbox.id } : message));
+    }
     stored.aliases = stored.aliases.map((alias) => (alias.folderId === id ? { ...alias, folderId: null } : alias));
     saveMockState(state);
     return mockRespond(undefined);

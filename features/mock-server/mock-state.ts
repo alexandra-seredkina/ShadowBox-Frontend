@@ -1,8 +1,10 @@
 import type { Alias } from "@/features/alias/api/alias-schemas";
 import type { Account, PowPurpose, RegisterResponse } from "@/features/auth/api/auth-schemas";
 import type { KdfParams } from "@/features/crypto/model/kdf";
+import type { EncryptedBlob } from "@/features/crypto/model/encrypted-blob";
 import type { EncryptedKey } from "@/features/crypto/model/key-pair";
 import type { Folder } from "@/features/folder/api/folder-schemas";
+import type { MessageSummary } from "@/features/message/api/message-schemas";
 
 const STORAGE_KEY = "shadowbox-mock-server";
 
@@ -14,6 +16,15 @@ export type StoredAccount = {
   account: Account;
   aliases: Alias[];
   folders: Folder[];
+  /** Newest first, as `GET /messages` returns them. */
+  messages: StoredMessage[];
+  /** Stands in for D-009 sender hashes: senders this account has had mail from. */
+  knownSenders: string[];
+};
+
+export type StoredMessage = MessageSummary & {
+  /** `GET /messages/{id}/content`: the raw MIME sealed for the account. */
+  readonly body: EncryptedBlob;
 };
 
 type StoredChallenge = {
@@ -62,7 +73,13 @@ export function loadMockState(): MockState {
   if (!raw) return emptyState();
   // Mock-only data written by this module; a broken value just resets the mock server.
   try {
-    return { ...emptyState(), ...(JSON.parse(raw) as Partial<MockState>) };
+    const state = { ...emptyState(), ...(JSON.parse(raw) as Partial<MockState>) };
+    // Accounts saved before the mock had mail start with an empty mailbox.
+    for (const stored of Object.values(state.accounts)) {
+      stored.messages ??= [];
+      stored.knownSenders ??= [];
+    }
+    return state;
   } catch {
     return emptyState();
   }

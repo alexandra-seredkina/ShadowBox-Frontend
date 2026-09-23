@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type ReactElement } from "react";
+import { useState, type ReactElement, type ReactNode } from "react";
 import { describeErrorWith } from "@/features/auth/model/auth-error";
 import { formatMessage } from "@/shared/i18n/format-message";
 import { localizePath, type Locale } from "@/shared/i18n/locales";
@@ -20,10 +20,12 @@ type FolderViewProps = {
   /** `inbox`, `spam`, `trash` or a custom folder id. */
   readonly slug: string;
   readonly messages: FoldersMessages;
+  /** The folder's messages, rendered once the folder is known to exist. */
+  readonly children: ReactNode;
 };
 
-/** The open folder. Messages arrive with the mail screens; until then it shows its empty state. */
-export function FolderView({ locale, slug, messages }: FolderViewProps): ReactElement | null {
+/** The open folder: its name and actions above whatever lists its mail. */
+export function FolderView({ locale, slug, messages, children }: FolderViewProps): ReactElement | null {
   const { state } = useFoldersContext();
   if (state.kind !== "ready") return null;
   const folder = findFolderBySlug(state.folders, slug);
@@ -39,16 +41,18 @@ export function FolderView({ locale, slug, messages }: FolderViewProps): ReactEl
     );
   }
   return (
-    <div className="grid content-start gap-6 py-8">
+    <div className="grid min-w-0 content-start gap-6 py-8">
       <FolderHeader folder={folder} locale={locale} messages={messages} />
-      <EmptyState title={text.empty.title} description={text.empty.text} />
+      {children}
     </div>
   );
 }
 
 type Dialog = "rename" | "delete" | null;
 
-function FolderHeader({ folder, locale, messages }: { readonly folder: FolderOption } & Omit<FolderViewProps, "slug">): ReactElement {
+type FolderHeaderProps = { readonly folder: FolderOption } & Omit<FolderViewProps, "slug" | "children">;
+
+function FolderHeader({ folder, locale, messages }: FolderHeaderProps): ReactElement {
   const { rename, remove } = useFoldersContext();
   const router = useRouter();
   const showToast = useToast();

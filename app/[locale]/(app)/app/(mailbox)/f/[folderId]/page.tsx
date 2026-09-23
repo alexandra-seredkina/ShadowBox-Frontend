@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ReactElement } from "react";
+import { MessageList } from "@/features/message/ui/message-list";
 import { FolderView } from "@/features/folder/ui/folder-view";
 import { isLocale } from "@/shared/i18n/locales";
 import { getMessages } from "@/shared/i18n/messages";
@@ -16,7 +17,11 @@ export async function generateMetadata({ params }: FolderPageProps): Promise<Met
 export default async function FolderPage({ params }: FolderPageProps): Promise<ReactElement> {
   const { locale, folderId } = await params;
   if (!isLocale(locale)) notFound();
-  const { folders, common, auth } = getMessages(locale);
+  const { folders, common, auth, mail } = getMessages(locale);
 
-  return <FolderView locale={locale} slug={decodeURIComponent(folderId)} messages={{ folders, common, errors: auth.errors }} />;
+  return (
+    <FolderView locale={locale} slug={decodeURIComponent(folderId)} messages={{ folders, common, errors: auth.errors }}>
+      <MessageList locale={locale} slug={decodeURIComponent(folderId)} messages={{ mail, folders, common, errors: auth.errors }} />
+    </FolderView>
+  );
 }

@@ -1,7 +1,9 @@
 import type { AliasApi } from "@/features/alias/api/alias-api";
 import type { Alias } from "@/features/alias/api/alias-schemas";
 import { mockFail, mockRespond } from "@/shared/api/mock-server";
+import { deliverMail } from "./mock-mail-delivery";
 import { newAlias } from "./mock-records";
+import { confirmationMail } from "./mock-sample-mail";
 import { accountView, findSessionAccount, loadMockState, saveMockState, type MockState, type StoredAccount } from "./mock-state";
 
 type Session = { readonly state: MockState; readonly stored: StoredAccount };
@@ -58,6 +60,9 @@ export const mockAliasApi: AliasApi = {
     });
     stored.aliases.unshift(alias);
     state.aliasReplays[idempotencyKey] = { request: JSON.stringify(request), alias };
+    if (alias.kind === "temporary") {
+      await deliverMail({ stored, aliasId: alias.id, mail: confirmationMail(alias.address), receivedAt: new Date() });
+    }
     saveMockState(state);
     return mockRespond(alias);
   },
@@ -85,6 +90,7 @@ export const mockAliasApi: AliasApi = {
     const isReauthFresh = state.reauthUntil !== null && state.reauthUntil > Date.now();
     if (alias.kind === "permanent" && !isReauthFresh) return mockFail({ status: 403, code: "REAUTH_REQUIRED" });
     stored.aliases = stored.aliases.filter((candidate) => candidate.id !== id);
+    stored.messages = stored.messages.map((message) => (message.aliasId === id ? { ...message, aliasId: null } : message));
     saveMockState(state);
     return mockRespond(undefined);
   },

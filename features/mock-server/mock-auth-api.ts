@@ -6,7 +6,9 @@ import { fromBase64Url, loadSodium, toBase64Url } from "@/features/crypto/model/
 import { countLeadingZeroBits } from "@/features/crypto/pow/pow-search";
 import type { PowSolution } from "@/features/crypto/pow/solve-pow";
 import { mockFail, mockRespond } from "@/shared/api/mock-server";
+import { deliverMail } from "./mock-mail-delivery";
 import { newAlias, systemFolders } from "./mock-records";
+import { sampleMailbox } from "./mock-sample-mail";
 import {
   accountView,
   findSessionAccount,
@@ -113,7 +115,7 @@ export const mockAuthApi: AuthApi = {
     if (state.accounts[login]) return mockFail({ status: 409, code: "LOGIN_TAKEN" });
 
     const response = { account: newAccount(login), firstAlias: newAlias({ kind: "permanent", ttl: null }) };
-    state.accounts[login] = {
+    const stored: StoredAccount = {
       authKey: request.authKey,
       kdf: request.kdf,
       publicKey: request.keys.publicKey,
@@ -121,7 +123,14 @@ export const mockAuthApi: AuthApi = {
       account: response.account,
       aliases: [response.firstAlias],
       folders: systemFolders(),
+      messages: [],
+      knownSenders: [],
     };
+    // There is no SMTP in the browser: the mock account starts with mail already delivered.
+    for (const { mail, receivedAt } of sampleMailbox(Date.now())) {
+      await deliverMail({ stored, aliasId: response.firstAlias.id, mail, receivedAt });
+    }
+    state.accounts[login] = stored;
     state.registerReplays[idempotencyKey] = { login, response };
     startSession(state, login);
     saveMockState(state);
