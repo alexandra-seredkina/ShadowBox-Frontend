@@ -49,7 +49,7 @@ export function MessageListItem({ row, locale, messages, isSelected, onToggle }:
           <span className={joinClassNames("min-w-0 flex-1 truncate", isUnread ? "font-semibold text-paper" : "text-steel")}>
             {sender}
           </span>
-          <time dateTime={summary.receivedAt} className="shrink-0 font-mono text-xs text-fog">
+          <time dateTime={summary.receivedAt} className="shrink-0 font-mono text-xs text-steel">
             {formatMoment(summary.receivedAt, locale)}
           </time>
         </span>
@@ -59,7 +59,7 @@ export function MessageListItem({ row, locale, messages, isSelected, onToggle }:
           </span>
           {preview?.hasAttachments ? <AttachmentIcon label={messages.attachment} /> : null}
         </span>
-        {preview && preview.snippet ? <span className="line-clamp-1 text-sm text-fog">{preview.snippet}</span> : null}
+        {preview && preview.snippet ? <span className="line-clamp-1 text-sm text-steel">{preview.snippet}</span> : null}
         <ThreatBadges
           verdict={summary.threat.verdict}
           isToTemporaryAlias={row.isToTemporaryAlias}

@@ -20,9 +20,9 @@ export function MessageSearch({ query, onQueryChange, placeholder, count }: Mess
         onChange={(e: ChangeEvent<HTMLInputElement>) => onQueryChange(e.target.value)}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="w-full bg-transparent text-sm text-paper outline-none placeholder:text-fog"
+        className="w-full bg-transparent text-sm text-paper outline-none placeholder:text-steel"
       />
-      {query && <span className="shrink-0 text-xs text-fog">{count}</span>}
+      {query && <span className="shrink-0 text-xs text-steel">{count}</span>}
     </div>
   );
 }

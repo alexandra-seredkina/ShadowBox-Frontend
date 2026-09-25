@@ -103,7 +103,7 @@ export function MessageView({ messageId, locale, messages }: MessageViewProps): 
           <p className="text-sm text-steel">{state.from}</p>
         </div>
         {summary && (
-          <div className="flex items-center justify-between text-xs text-fog">
+          <div className="flex items-center justify-between text-xs text-steel">
             <time dateTime={summary.receivedAt}>{formatMoment(summary.receivedAt, locale)}</time>
             <MessageAuth threat={summary.threat} labels={messages.mail.auth} />
           </div>
@@ -115,7 +115,7 @@ export function MessageView({ messageId, locale, messages }: MessageViewProps): 
       ) : state.text ? (
         <pre className="bg-surface rounded p-4 overflow-auto text-sm text-steel whitespace-pre-wrap break-words">{state.text}</pre>
       ) : (
-        <p className="text-center text-fog text-sm">{messages.mail.unreadable.subject}</p>
+        <p className="text-center text-steel text-sm">{messages.mail.unreadable.subject}</p>
       )}
 
       {state.attachments.length > 0 && (
@@ -126,7 +126,7 @@ export function MessageView({ messageId, locale, messages }: MessageViewProps): 
               <li key={index} className="flex items-center justify-between gap-3 rounded bg-surface p-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate">{att.filename}</p>
-                  <p className="text-xs text-fog">{att.contentType}</p>
+                  <p className="text-xs text-steel">{att.contentType}</p>
                 </div>
                 <a
                   href={URL.createObjectURL(new Blob([Buffer.from(att.content)], { type: att.contentType }))}

@@ -80,7 +80,7 @@ export function MessageRows({ list, state, folder, folders, locale, messages }: 
         count={filteredRows.length}
       />
       {filteredRows.length === 0 && searchQuery ? (
-        <p className="py-8 text-center text-sm text-fog">{text.noResults}</p>
+        <p className="py-8 text-center text-sm text-steel">{text.noResults}</p>
       ) : (
         <ul aria-label={text.listLabel} className="-mx-2 sm:-mx-3">
           {filteredRows.map((row) => (
@@ -97,7 +97,7 @@ export function MessageRows({ list, state, folder, folders, locale, messages }: 
       )}
       {state.loadMoreError ? <FormError message={describe(state.loadMoreError)} /> : null}
       {state.nextCursor === null ? (
-        <p className="py-6 text-center text-sm text-fog">{text.end}</p>
+        <p className="py-6 text-center text-sm text-steel">{text.end}</p>
       ) : (
         <LoadMore
           isLoading={state.isLoadingMore}

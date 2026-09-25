@@ -26,7 +26,7 @@ export function MessageAuth({ threat, labels }: MessageAuthProps): ReactElement 
   const color = (result: "pass" | "fail" | "none") => {
     if (result === "pass") return "text-safe";
     if (result === "fail") return "text-red";
-    return "text-fog";
+    return "text-steel";
   };
   const label = (result: "pass" | "fail" | "none") => {
     if (result === "pass") return labels.pass;
@@ -40,19 +40,19 @@ export function MessageAuth({ threat, labels }: MessageAuthProps): ReactElement 
         <div className={`font-mono font-semibold ${color(spf)}`}>
           {icon(spf)} {labels.spf}
         </div>
-        <div className="text-xs text-fog">{label(spf)}</div>
+        <div className="text-xs text-steel">{label(spf)}</div>
       </div>
       <div>
         <div className={`font-mono font-semibold ${color(dkim)}`}>
           {icon(dkim)} {labels.dkim}
         </div>
-        <div className="text-xs text-fog">{label(dkim)}</div>
+        <div className="text-xs text-steel">{label(dkim)}</div>
       </div>
       <div>
         <div className={`font-mono font-semibold ${color(dmarc)}`}>
           {icon(dmarc)} {labels.dmarc}
         </div>
-        <div className="text-xs text-fog">{label(dmarc)}</div>
+        <div className="text-xs text-steel">{label(dmarc)}</div>
       </div>
     </div>
   );

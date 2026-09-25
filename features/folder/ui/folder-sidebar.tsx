@@ -53,9 +53,8 @@ export function FolderSidebar({ locale, messages }: FolderSidebarProps): ReactEl
 
   return (
     <div className="grid content-start gap-3 lg:py-8">
-      {/* On phones the list scrolls sideways inside itself; the page never does. */}
-      <nav aria-label={text.sidebarLabel} className="-mx-4 overflow-x-auto px-4 lg:mx-0 lg:px-0">
-        <ul className="flex gap-1 lg:grid">
+      <nav aria-label={text.sidebarLabel} className="grid">
+        <ul className="grid gap-1">
           {sortFolders(state.folders, locale).map((folder) => (
             <FolderLink key={folder.id} folder={folder} locale={locale} messages={messages} isActive={params.folderId === folderSlug(folder)} />
           ))}
