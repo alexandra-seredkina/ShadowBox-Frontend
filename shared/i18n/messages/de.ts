@@ -243,7 +243,7 @@ export const de: Messages = {
   },
   appNav: { label: "Bereiche des Postfachs", inbox: "Postfach", aliases: "Adressen", settings: "Einstellungen", signOut: "Abmelden" },
   folders: {
-    system: { inbox: "Posteingang", spam: "Spam", trash: "Papierkorb" },
+    system: { inbox: "Posteingang", archive: "Archiv", spam: "Spam", trash: "Papierkorb" },
     unreadable: "Ordner ohne Namen",
     sidebarLabel: "Ordner",
     loading: "Ordner werden geladen…",
@@ -320,7 +320,8 @@ export const de: Messages = {
     errors: { NOT_FOUND: "Der Ordner oder die Nachricht ist weg. Lade die Seite neu." },
     empty: {
       inbox: { title: "Noch keine Nachrichten", text: "Gib einer Website eine deiner Adressen, dann erscheint ihre Post hier." },
-      spam: { title: "Kein Spam", text: "Ein Spamfilter kommt später. Bis dahin landet hier nur, was du selbst verschiebst." },
+      archive: { title: "Archiv ist leer", text: "Hier liegen Nachrichten, die du behalten willst, ohne dass sie den Posteingang füllen." },
+      spam: { title: "Kein Spam", text: "Hier landet Mail von blockierten Absendern und alles, was du selbst hierher verschiebst." },
       trash: { title: "Der Papierkorb ist leer", text: "Gelöschte Nachrichten landen zuerst hier." },
       custom: { title: "Hier ist noch nichts", text: "Damit die Post einer Adresse hier landet, wähle bei der Adresse diesen Ordner." },
       toAliases: "Meine Adressen",

@@ -36,7 +36,10 @@ export const messageSummarySchema = z.object({
   aliasId: z.string().nullable(),
   receivedAt: z.iso.datetime(),
   isRead: z.boolean(),
+  isStarred: z.boolean().default(false),
   sizeBytes: z.number().int().nonnegative(),
+  /** In label creation order. */
+  labelIds: z.array(z.string()).default([]),
   threat: threatSchema,
   encryptedPreview: encryptedBlobSchema,
 });
@@ -67,16 +70,29 @@ export const MESSAGE_PAGE_LIMIT = 50;
 /** API.md §8: `ids` in one batch request. */
 export const MAX_BATCH_IDS = 100;
 
+/** Which messages a list shows; starred and labelled ones come from every folder but the trash. */
+export type MessageScope =
+  | { readonly kind: "folder"; readonly folderId: string }
+  | { readonly kind: "label"; readonly labelId: string }
+  | { readonly kind: "starred" };
+
 export type ListMessagesRequest = {
-  readonly folderId: string;
+  readonly scope: MessageScope;
   readonly cursor: string | null;
   readonly limit?: number;
 };
 
-export type UpdateMessageRequest = { readonly isRead?: boolean; readonly folderId?: string };
+export type UpdateMessageRequest = {
+  readonly isRead?: boolean;
+  readonly isStarred?: boolean;
+  readonly folderId?: string;
+  /** Replaces the whole set. */
+  readonly labelIds?: readonly string[];
+};
 
 export type BatchRequest =
-  | { readonly ids: readonly string[]; readonly action: "markRead" | "markUnread" | "delete" }
-  | { readonly ids: readonly string[]; readonly action: "move"; readonly folderId: string };
+  | { readonly ids: readonly string[]; readonly action: "markRead" | "markUnread" | "star" | "unstar" | "delete" }
+  | { readonly ids: readonly string[]; readonly action: "move"; readonly folderId: string }
+  | { readonly ids: readonly string[]; readonly action: "label" | "unlabel"; readonly labelId: string };
 
 export const batchResultSchema = z.object({ processed: z.number().int().nonnegative() });

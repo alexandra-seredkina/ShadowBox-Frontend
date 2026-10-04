@@ -38,13 +38,13 @@ afterAll(async () => {
 });
 
 describe("aliases on the mock API", () => {
-  it("starts with the permanent address created at sign-up and three system folders", async () => {
+  it("starts with the permanent address created at sign-up and four system folders", async () => {
     const aliases = await aliasApi.listAliases();
     const folders = await folderApi.listFolders();
 
-    expect(aliases).toMatchObject([{ kind: "permanent", status: "active", folderId: null, expiresAt: null }]);
+    expect(aliases).toMatchObject([{ kind: "permanent", status: "active", folderId: null, labelIds: [], expiresAt: null }]);
     expect(aliases[0]?.address).toMatch(/^[a-z0-9]{10}@/);
-    expect(folders.map((folder) => folder.systemRole)).toEqual(["inbox", "spam", "trash"]);
+    expect(folders.map((folder) => folder.systemRole)).toEqual(["inbox", "archive", "spam", "trash"]);
   });
 
   it("creates a temporary address whose label only the owner can read", async () => {

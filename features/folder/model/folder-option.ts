@@ -5,7 +5,7 @@ import { folderNameSchema, type Folder, type SystemRole } from "../api/folder-sc
 
 export const FOLDER_NAME_MAX_LENGTH = 64;
 
-const SYSTEM_ORDER: readonly SystemRole[] = ["inbox", "spam", "trash"];
+const SYSTEM_ORDER: readonly SystemRole[] = ["inbox", "archive", "spam", "trash"];
 
 /** A folder ready for the UI: system folders are named by the dictionary, custom ones are decrypted. */
 export type FolderOption = {

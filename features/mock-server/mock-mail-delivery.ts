@@ -25,7 +25,7 @@ function verdictOf(markers: readonly ThreatMarker[]): Threat["verdict"] {
 }
 
 /** Mirrors D-009 closely enough for the mock: a keyed hash, never the address itself. */
-async function senderKey(stored: StoredAccount, address: string): Promise<string> {
+export async function senderKey(stored: StoredAccount, address: string): Promise<string> {
   const sodium = await loadSodium();
   return toBase64Url(sodium, sodium.crypto_generichash(16, `${stored.publicKey}:${address.toLowerCase()}`, null));
 }
@@ -59,12 +59,14 @@ export async function deliverMail(params: {
   const { stored, aliasId, mail, receivedAt } = params;
   const alias = stored.aliases.find((candidate) => candidate.id === aliasId);
   const inbox = stored.folders.find((folder) => folder.systemRole === "inbox");
-  if (!alias || !inbox) throw new Error("Mock delivery needs an alias and an inbox");
+  const spam = stored.folders.find((folder) => folder.systemRole === "spam");
+  if (!alias || !inbox || !spam) throw new Error("Mock delivery needs an alias, an inbox and a spam folder");
 
   const sodium = await loadSodium();
   const publicKey = fromBase64Url(sodium, stored.publicKey);
   const sender = await senderKey(stored, mail.from.address);
   const isKnownSender = stored.knownSenders.includes(sender);
+  const isBlocked = stored.blockedSenders.some((blocked) => blocked.sender === sender);
   const markers: ThreatMarker[] = isKnownSender ? [...mail.markers] : ["UNKNOWN_SENDER", ...mail.markers];
   const mime = new TextEncoder().encode(
     buildMime({ ...mail, to: alias.address, date: receivedAt, html: mail.html ?? null, attachments: mail.attachments ?? [] }),
@@ -72,10 +74,12 @@ export async function deliverMail(params: {
 
   const message: StoredMessage = {
     id: newId(),
-    folderId: alias.folderId ?? inbox.id,
+    folderId: isBlocked ? spam.id : (alias.folderId ?? inbox.id),
     aliasId,
     receivedAt: receivedAt.toISOString(),
     isRead: false,
+    isStarred: false,
+    labelIds: [...alias.labelIds],
     sizeBytes: Math.ceil(mime.length / KIB) * KIB,
     threat: { verdict: verdictOf(markers), markers, auth: mail.auth },
     encryptedPreview: await sealJson(previewOf(mail), publicKey),

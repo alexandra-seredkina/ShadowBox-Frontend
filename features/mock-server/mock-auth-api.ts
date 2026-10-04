@@ -125,6 +125,8 @@ export const mockAuthApi: AuthApi = {
       folders: systemFolders(),
       messages: [],
       knownSenders: [],
+      labels: [],
+      blockedSenders: [],
     };
     // There is no SMTP in the browser: the mock account starts with mail already delivered.
     for (const { mail, receivedAt } of sampleMailbox(Date.now())) {

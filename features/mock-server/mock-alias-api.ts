@@ -21,6 +21,22 @@ function hasFolder(stored: StoredAccount, folderId: string | null | undefined): 
   return folderId === null || folderId === undefined || stored.folders.some((folder) => folder.id === folderId);
 }
 
+/** API.md §6: up to 10 own labels, each once, kept in label creation order. */
+const MAX_LABELS_PER_ALIAS = 10;
+
+function labelsCheck(stored: StoredAccount, labelIds: readonly string[] | undefined): "ok" | "invalid" | "missing" {
+  if (labelIds === undefined) return "ok";
+  if (new Set(labelIds).size !== labelIds.length || labelIds.length > MAX_LABELS_PER_ALIAS) return "invalid";
+  return labelIds.every((labelId) => stored.labels.some((label) => label.id === labelId)) ? "ok" : "missing";
+}
+
+function inLabelOrder(stored: StoredAccount, labelIds: readonly string[]): string[] {
+  return stored.labels.map((label) => label.id).filter((id) => labelIds.includes(id));
+}
+
+const invalidLabels = (): Promise<never> =>
+  mockFail({ status: 400, code: "VALIDATION_FAILED", details: [{ path: "labelIds", issue: "invalid_format" }] });
+
 /** API.md §6: only `active` addresses count towards the limit. */
 function isAtActiveLimit(stored: StoredAccount): boolean {
   const { activeAliases, maxActiveAliases } = accountView(stored).limits;
@@ -49,7 +65,9 @@ export const mockAliasApi: AliasApi = {
         ? mockRespond(replay.alias)
         : mockFail({ status: 409, code: "IDEMPOTENCY_CONFLICT" });
     }
-    if (!hasFolder(stored, request.folderId)) return notFound();
+    const labels = labelsCheck(stored, request.labelIds);
+    if (labels === "invalid") return invalidLabels();
+    if (!hasFolder(stored, request.folderId) || labels === "missing") return notFound();
     if (isAtActiveLimit(stored)) return mockFail({ status: 422, code: "ALIAS_LIMIT_EXCEEDED" });
 
     const alias = newAlias({
@@ -57,6 +75,7 @@ export const mockAliasApi: AliasApi = {
       ttl: request.kind === "temporary" ? request.ttl : null,
       encryptedLabel: request.encryptedLabel,
       folderId: request.folderId,
+      labelIds: inLabelOrder(stored, request.labelIds ?? []),
     });
     stored.aliases.unshift(alias);
     state.aliasReplays[idempotencyKey] = { request: JSON.stringify(request), alias };
@@ -72,10 +91,16 @@ export const mockAliasApi: AliasApi = {
     if (!session) return unauthenticated();
     const index = session.stored.aliases.findIndex((alias) => alias.id === id);
     const current = session.stored.aliases[index];
-    if (!current || !hasFolder(session.stored, request.folderId)) return notFound();
+    const labels = labelsCheck(session.stored, request.labelIds);
+    if (labels === "invalid") return invalidLabels();
+    if (!current || !hasFolder(session.stored, request.folderId) || labels === "missing") return notFound();
     const isEnabling = request.status === "active" && current.status === "disabled";
     if (isEnabling && isAtActiveLimit(session.stored)) return mockFail({ status: 422, code: "ALIAS_LIMIT_EXCEEDED" });
-    const updated: Alias = { ...current, ...request };
+    const updated: Alias = {
+      ...current,
+      ...request,
+      labelIds: request.labelIds === undefined ? current.labelIds : inLabelOrder(session.stored, request.labelIds),
+    };
     session.stored.aliases[index] = updated;
     saveMockState(session.state);
     return mockRespond(updated);

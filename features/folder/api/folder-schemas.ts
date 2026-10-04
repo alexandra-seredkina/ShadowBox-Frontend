@@ -5,7 +5,7 @@ import { encryptedBlobSchema } from "@/features/crypto/model/encrypted-blob";
 export const folderSchema = z.object({
   id: z.string(),
   kind: z.enum(["system", "custom"]),
-  systemRole: z.enum(["inbox", "spam", "trash"]).nullable(),
+  systemRole: z.enum(["inbox", "archive", "spam", "trash"]).nullable(),
   encryptedName: encryptedBlobSchema.nullable(),
   unreadCount: z.number().int(),
 });

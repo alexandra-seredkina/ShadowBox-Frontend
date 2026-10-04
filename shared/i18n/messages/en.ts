@@ -235,7 +235,7 @@ export const en: Messages = {
   },
   appNav: { label: "Inbox sections", inbox: "Inbox", aliases: "Addresses", settings: "Settings", signOut: "Sign out" },
   folders: {
-    system: { inbox: "Inbox", spam: "Spam", trash: "Trash" },
+    system: { inbox: "Inbox", archive: "Archive", spam: "Spam", trash: "Trash" },
     unreadable: "Unnamed folder",
     sidebarLabel: "Folders",
     loading: "Loading folders…",
@@ -312,7 +312,8 @@ export const en: Messages = {
     errors: { NOT_FOUND: "The folder or message is gone. Reload the page." },
     empty: {
       inbox: { title: "No messages yet", text: "Give one of your addresses to a site, and its mail shows up here." },
-      spam: { title: "No spam", text: "A spam filter comes later. For now only what you move here yourself ends up here." },
+      archive: { title: "Archive is empty", text: "Keep messages here that you want to hold on to without cluttering the Inbox." },
+      spam: { title: "No spam", text: "Mail from blocked senders lands here, along with whatever you move here yourself." },
       trash: { title: "Trash is empty", text: "Deleted messages land here first." },
       custom: { title: "Nothing here yet", text: "To get an address's mail here, pick this folder for that address." },
       toAliases: "My addresses",

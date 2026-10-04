@@ -55,7 +55,7 @@ export function useMessageList(folderId: string, onUnreadChange: (delta: Readonl
 
   useEffect(() => {
     let isCurrent = true;
-    Promise.all([loadTemporaryAliasIds(), messageApi.listMessages({ folderId, cursor: null })])
+    Promise.all([loadTemporaryAliasIds(), messageApi.listMessages({ scope: { kind: "folder", folderId }, cursor: null })])
       .then(async ([temporaryAliasIds, page]) => {
         aliasIds.current = temporaryAliasIds;
         return { rows: await decryptPage(page, temporaryAliasIds), nextCursor: page.nextCursor };
@@ -80,7 +80,7 @@ export function useMessageList(folderId: string, onUnreadChange: (delta: Readonl
     isLoadingMore.current = true;
     setState((current) => (current.kind === "ready" ? { ...current, isLoadingMore: true, loadMoreError: null } : current));
     messageApi
-      .listMessages({ folderId, cursor })
+      .listMessages({ scope: { kind: "folder", folderId }, cursor })
       .then(async (page) => ({ rows: await decryptPage(page, aliasIds.current), nextCursor: page.nextCursor }))
       .then(
         ({ rows, nextCursor }) => {

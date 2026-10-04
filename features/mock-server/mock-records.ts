@@ -33,6 +33,7 @@ export function newAlias(params: {
   readonly ttl: AliasTtl | null;
   readonly encryptedLabel?: Alias["encryptedLabel"];
   readonly folderId?: string | null;
+  readonly labelIds?: readonly string[];
 }): Alias {
   return {
     id: newId(),
@@ -41,6 +42,7 @@ export function newAlias(params: {
     status: "active",
     encryptedLabel: params.encryptedLabel ?? null,
     folderId: params.folderId ?? null,
+    labelIds: [...(params.labelIds ?? [])],
     expiresAt: params.ttl === null ? null : new Date(Date.now() + TTL_MS[params.ttl]).toISOString(),
     createdAt: today(),
     lastReceivedAt: null,
@@ -48,7 +50,7 @@ export function newAlias(params: {
 }
 
 export function systemFolders(): Folder[] {
-  return (["inbox", "spam", "trash"] as const).map((systemRole) => ({
+  return (["inbox", "archive", "spam", "trash"] as const).map((systemRole) => ({
     id: newId(),
     kind: "system",
     systemRole,

@@ -100,7 +100,7 @@ describe("sortFolders and slugs", () => {
 
     const sorted = sortFolders([zeta, ...system.reverse(), alpha], "en");
 
-    expect(sorted.map(folderSlug)).toEqual(["inbox", "spam", "trash", alpha.id, zeta.id]);
+    expect(sorted.map(folderSlug)).toEqual(["inbox", "archive", "spam", "trash", alpha.id, zeta.id]);
     expect(findFolderBySlug(sorted, "spam")?.systemRole).toBe("spam");
     expect(findFolderBySlug(sorted, zeta.id)).toBe(zeta);
     expect(findFolderBySlug(sorted, "missing")).toBeNull();

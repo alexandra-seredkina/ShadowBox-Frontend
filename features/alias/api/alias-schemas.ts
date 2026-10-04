@@ -9,6 +9,8 @@ export const aliasSchema = z.object({
   status: z.enum(["active", "disabled"]),
   encryptedLabel: encryptedBlobSchema.nullable(),
   folderId: z.string().nullable(),
+  /** Labels new mail to this address gets (API.md §6). */
+  labelIds: z.array(z.string()).default([]),
   expiresAt: z.iso.datetime().nullable(),
   createdAt: z.iso.date(),
   lastReceivedAt: z.iso.date().nullable(),
@@ -29,12 +31,15 @@ export type CreateAliasRequest = (
 ) & {
   readonly encryptedLabel: EncryptedBlob | null;
   readonly folderId: string | null;
+  readonly labelIds?: readonly string[];
 };
 
 export type UpdateAliasRequest = {
   readonly status?: Alias["status"];
   readonly encryptedLabel?: EncryptedBlob | null;
   readonly folderId?: string | null;
+  /** Replaces the whole set. */
+  readonly labelIds?: readonly string[];
 };
 
 /** What `encryptedLabel` decrypts to. */

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { DecryptionFailedError } from "@/features/crypto/model/crypto-errors";
 import { openBlob } from "@/features/crypto/model/encrypted-blob";
 import { getUnlockedKeys } from "@/features/crypto/model/key-store";
@@ -57,10 +57,10 @@ export function MessageView({ messageId, locale, messages }: MessageViewProps): 
           const subject = email.subject || messages.mail.noSubject;
           const html = email.html ?? null;
           const text = email.text ?? null;
-          const attachments = (email.attachments || []).map((att: any) => ({
+          const attachments = email.attachments.map((att) => ({
             filename: att.filename || "unnamed",
-            contentType: att.contentType || "application/octet-stream",
-            content: new Uint8Array(Buffer.from(att.content, "binary")),
+            contentType: att.mimeType || "application/octet-stream",
+            content: typeof att.content === "string" ? new TextEncoder().encode(att.content) : new Uint8Array(att.content),
           }));
 
           if (isCurrent) {

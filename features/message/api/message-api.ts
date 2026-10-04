@@ -11,6 +11,7 @@ import {
   type BatchRequest,
   type ListMessagesRequest,
   type MessagePage,
+  type MessageScope,
   type MessageSummary,
   type UpdateMessageRequest,
 } from "./message-schemas";
@@ -29,13 +30,24 @@ export type MessageApi = {
   readonly deleteMessage: (id: string) => Promise<void>;
 };
 
+function scopeQuery(scope: MessageScope): Record<string, string> {
+  switch (scope.kind) {
+    case "folder":
+      return { folderId: scope.folderId };
+    case "label":
+      return { labelId: scope.labelId };
+    case "starred":
+      return { starred: "true" };
+  }
+}
+
 function messagePath(id: string): string {
   return `/messages/${encodeURIComponent(id)}`;
 }
 
 const httpMessageApi: MessageApi = {
-  listMessages: ({ folderId, cursor, limit = MESSAGE_PAGE_LIMIT }) => {
-    const query = new URLSearchParams({ folderId, limit: String(limit) });
+  listMessages: ({ scope, cursor, limit = MESSAGE_PAGE_LIMIT }) => {
+    const query = new URLSearchParams({ ...scopeQuery(scope), limit: String(limit) });
     if (cursor !== null) query.set("cursor", cursor);
     return requestJson(`/messages?${query.toString()}`, messagePageSchema);
   },

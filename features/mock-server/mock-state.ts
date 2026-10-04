@@ -4,6 +4,7 @@ import type { KdfParams } from "@/features/crypto/model/kdf";
 import type { EncryptedBlob } from "@/features/crypto/model/encrypted-blob";
 import type { EncryptedKey } from "@/features/crypto/model/key-pair";
 import type { Folder } from "@/features/folder/api/folder-schemas";
+import type { Label } from "@/features/label/api/label-schemas";
 import type { MessageSummary } from "@/features/message/api/message-schemas";
 
 const STORAGE_KEY = "shadowbox-mock-server";
@@ -20,6 +21,17 @@ export type StoredAccount = {
   messages: StoredMessage[];
   /** Stands in for D-009 sender hashes: senders this account has had mail from. */
   knownSenders: string[];
+  /** `unreadCount` is worked out per request, as the server does. */
+  labels: Omit<Label, "unreadCount">[];
+  blockedSenders: StoredBlockedSender[];
+};
+
+export type StoredBlockedSender = {
+  readonly id: string;
+  /** The same keyed hash as `knownSenders`; the address itself is not kept. */
+  readonly sender: string;
+  readonly encryptedAddress: EncryptedBlob;
+  readonly createdAt: string;
 };
 
 export type StoredMessage = MessageSummary & {
@@ -78,6 +90,10 @@ export function loadMockState(): MockState {
     for (const stored of Object.values(state.accounts)) {
       stored.messages ??= [];
       stored.knownSenders ??= [];
+      stored.labels ??= [];
+      stored.blockedSenders ??= [];
+      stored.messages = stored.messages.map((message) => ({ ...message, isStarred: message.isStarred ?? false, labelIds: message.labelIds ?? [] }));
+      stored.aliases = stored.aliases.map((alias) => ({ ...alias, labelIds: alias.labelIds ?? [] }));
     }
     return state;
   } catch {
