@@ -58,8 +58,10 @@ function annotateLink(anchor: HTMLAnchorElement, document: Document): void {
 
 function estimateHeight(body: HTMLElement): number {
   const textLength = (body.textContent ?? "").replace(/\s+/gu, " ").length;
-  const blocks = body.querySelectorAll("p, div, tr, li, h1, h2, h3, br, hr, blockquote").length;
-  const estimate = 56 + Math.ceil(textLength / 72) * 24 + blocks * 10;
+  // Rows and list items take a line each however short their text is.
+  const lines = body.querySelectorAll("tr, li, br").length;
+  const blocks = body.querySelectorAll("p, div, h1, h2, h3, h4, hr, blockquote, table, ul, ol").length;
+  const estimate = 64 + Math.ceil(textLength / 80) * 24 + lines * 34 + blocks * 18;
   return Math.min(Math.max(estimate, 140), 1600);
 }
 
