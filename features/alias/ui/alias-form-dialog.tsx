@@ -3,6 +3,7 @@
 import { useId, useState, type FormEvent, type ReactElement } from "react";
 import { folderName } from "@/features/folder/model/folder-name";
 import type { FolderOption } from "@/features/folder/model/folder-option";
+import type { LabelOption } from "@/features/label/model/label-option";
 import { FormError } from "@/features/auth/ui/form-error";
 import { formatMessage } from "@/shared/i18n/format-message";
 import { Button } from "@/shared/ui/button";
@@ -22,8 +23,9 @@ type AliasFormDialogProps = {
   readonly mode: "create" | "edit";
   readonly isOpen: boolean;
   /** Values to start from when editing. */
-  readonly initial: { readonly label: string; readonly folderId: string | null };
+  readonly initial: { readonly label: string; readonly folderId: string | null; readonly labelIds: readonly string[] };
   readonly folders: readonly FolderOption[];
+  readonly labels: readonly LabelOption[];
   readonly messages: AliasesMessages;
   readonly onClose: () => void;
   /** Resolves to an error message to show, or null when the dialog may close. */
@@ -35,7 +37,7 @@ function isTtl(value: string): value is AliasTtl {
 }
 
 export function AliasFormDialog(props: AliasFormDialogProps): ReactElement {
-  const { mode, isOpen, initial, folders, messages, onClose, onSubmit } = props;
+  const { mode, isOpen, initial, folders, labels, messages, onClose, onSubmit } = props;
   const id = useId();
   const text = messages.page.form;
   const [kind, setKind] = useState<Alias["kind"]>("temporary");
@@ -54,7 +56,8 @@ export function AliasFormDialog(props: AliasFormDialogProps): ReactElement {
     const folderId = String(form.get("folderId") ?? INBOX_VALUE);
     setIsSubmitting(true);
     setError(null);
-    const draft = { kind, ttl: isTtl(ttl) ? ttl : DEFAULT_TTL, label, folderId: folderId === INBOX_VALUE ? null : folderId };
+    const labelIds = form.getAll("labelIds").map(String);
+    const draft = { kind, ttl: isTtl(ttl) ? ttl : DEFAULT_TTL, label, folderId: folderId === INBOX_VALUE ? null : folderId, labelIds };
     setError(await onSubmit(draft));
     setIsSubmitting(false);
   }
@@ -91,6 +94,30 @@ export function AliasFormDialog(props: AliasFormDialogProps): ReactElement {
             </select>
           )}
         </Field>
+        {labels.length > 0 ? (
+          <fieldset className="grid gap-2">
+            <legend className="mb-2 text-sm font-medium">{text.labelsField}</legend>
+            <div className="flex flex-wrap gap-2">
+              {labels.map((option) => (
+                <label
+                  key={option.id}
+                  className="flex cursor-pointer items-center gap-2 rounded-control border border-line px-2.5 py-1.5 text-sm has-checked:border-fog has-checked:bg-surface-2"
+                >
+                  <input
+                    type="checkbox"
+                    name="labelIds"
+                    value={option.id}
+                    defaultChecked={initial.labelIds.includes(option.id)}
+                    className="size-4 accent-red"
+                  />
+                  <span className="size-2.5 rounded-full" style={{ backgroundColor: option.color }} />
+                  {option.name ?? messages.page.form.unnamedLabel}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-fog">{text.labelsHint}</p>
+          </fieldset>
+        ) : null}
         <div className="flex flex-wrap justify-end gap-3">
           <Button variant="ghost" disabled={isSubmitting} onClick={onClose}>
             {text.cancel}

@@ -6,6 +6,7 @@ import { describeAuthError } from "@/features/auth/model/auth-error";
 import { isReauthRequired } from "@/features/auth/model/reauth";
 import { FormError } from "@/features/auth/ui/form-error";
 import { ReauthDialog } from "@/features/auth/ui/reauth-dialog";
+import { BlockedSendersCard } from "@/features/blocked-sender/ui/blocked-senders-card";
 import { localizePath, type Locale } from "@/shared/i18n/locales";
 import type { Messages } from "@/shared/i18n/messages";
 import { Button } from "@/shared/ui/button";
@@ -21,6 +22,8 @@ export type SettingsMessages = {
   readonly page: Messages["settingsPage"];
   readonly common: Messages["common"];
   readonly auth: Pick<Messages["auth"], "reauth" | "errors" | "fields">;
+  readonly blocked: Messages["mailbox"]["blocked"];
+  readonly unblockedToast: string;
 };
 
 type SettingsScreenProps = { readonly locale: Locale; readonly messages: SettingsMessages };
@@ -112,6 +115,12 @@ export function SettingsScreen({ locale, messages }: SettingsScreenProps): React
           <span>{text.ipBinding.label}</span>
         </label>
       </Card>
+      <BlockedSendersCard
+        locale={locale}
+        messages={messages.blocked}
+        unblockedToast={messages.unblockedToast}
+        errors={messages.auth.errors}
+      />
       <Card className="grid gap-3 border-red/40">
         <h2 className="font-display text-lg font-medium">{text.danger.title}</h2>
         <p className="text-sm text-steel">{text.danger.text}</p>

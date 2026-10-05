@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { getUnlockedKeys } from "@/features/crypto/model/key-store";
 import type { KeyPair } from "@/features/crypto/model/key-pair";
+import { labelApi } from "@/features/label/api/label-api";
+import { toLabelOption, type LabelOption } from "@/features/label/model/label-option";
 import { folderApi } from "@/features/folder/api/folder-api";
 import { isAliasDestination, toFolderOption, type FolderOption } from "@/features/folder/model/folder-option";
 import { aliasApi } from "../api/alias-api";
@@ -14,14 +16,21 @@ export type AliasDraft = {
   readonly ttl: AliasTtl;
   readonly label: string;
   readonly folderId: string | null;
+  /** Labels new mail to this address gets. */
+  readonly labelIds: readonly string[];
 };
 
-export type AliasEdit = { readonly label: string; readonly folderId: string | null };
+export type AliasEdit = { readonly label: string; readonly folderId: string | null; readonly labelIds: readonly string[] };
 
 export type AliasesState =
   | { readonly kind: "loading" }
   | { readonly kind: "failed"; readonly error: unknown }
-  | { readonly kind: "ready"; readonly aliases: readonly AliasView[]; readonly folders: readonly FolderOption[] };
+  | {
+      readonly kind: "ready";
+      readonly aliases: readonly AliasView[];
+      readonly folders: readonly FolderOption[];
+      readonly labels: readonly LabelOption[];
+    };
 
 function requireKeys(): KeyPair {
   const keys = getUnlockedKeys();
@@ -30,12 +39,13 @@ function requireKeys(): KeyPair {
   return keys;
 }
 
-async function loadAll(): Promise<{ aliases: AliasView[]; folders: FolderOption[] }> {
+async function loadAll(): Promise<{ aliases: AliasView[]; folders: FolderOption[]; labels: LabelOption[] }> {
   const keys = requireKeys();
-  const [aliases, folders] = await Promise.all([aliasApi.listAliases(), folderApi.listFolders()]);
+  const [aliases, folders, labels] = await Promise.all([aliasApi.listAliases(), folderApi.listFolders(), labelApi.listLabels()]);
   return {
     aliases: await Promise.all(aliases.map((alias) => toAliasView(alias, keys))),
     folders: (await Promise.all(folders.map((folder) => toFolderOption(folder, keys)))).filter(isAliasDestination),
+    labels: await Promise.all(labels.map((label) => toLabelOption(label, keys))),
   };
 }
 
@@ -80,7 +90,7 @@ export function useAliases(): {
   const create = useCallback(
     async (draft: AliasDraft, idempotencyKey: string) => {
       const encryptedLabel = await sealAliasLabel(draft.label, requireKeys().publicKey);
-      const common = { encryptedLabel, folderId: draft.folderId };
+      const common = { encryptedLabel, folderId: draft.folderId, labelIds: draft.labelIds };
       const request = draft.kind === "temporary" ? { kind: draft.kind, ttl: draft.ttl, ...common } : { kind: draft.kind, ...common };
       await replace(await aliasApi.createAlias(request, idempotencyKey));
     },
@@ -90,7 +100,7 @@ export function useAliases(): {
   const edit = useCallback(
     async (alias: Alias, change: AliasEdit) => {
       const encryptedLabel = await sealAliasLabel(change.label, requireKeys().publicKey);
-      await replace(await aliasApi.updateAlias(alias.id, { encryptedLabel, folderId: change.folderId }));
+      await replace(await aliasApi.updateAlias(alias.id, { encryptedLabel, folderId: change.folderId, labelIds: change.labelIds }));
     },
     [replace],
   );

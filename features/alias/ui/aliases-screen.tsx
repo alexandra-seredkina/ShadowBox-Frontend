@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import { FormError } from "@/features/auth/ui/form-error";
 import { ReauthDialog } from "@/features/auth/ui/reauth-dialog";
 import type { FolderOption } from "@/features/folder/model/folder-option";
+import type { LabelOption } from "@/features/label/model/label-option";
 import type { Locale } from "@/shared/i18n/locales";
 import { Button } from "@/shared/ui/button";
 import { EmptyState } from "@/shared/ui/empty-state";
@@ -17,11 +18,16 @@ import type { AliasesMessages } from "./aliases-messages";
 import { RevokeAliasDialog } from "./revoke-alias-dialog";
 import { useAliasDialogs, type AliasDialogs } from "./use-alias-dialogs";
 
-type AliasesScreenProps = { readonly locale: Locale; readonly messages: AliasesMessages };
+type AliasesScreenProps = {
+  readonly locale: Locale;
+  readonly messages: AliasesMessages;
+  /** Opened from the mailbox's "New address" button: start with the form. */
+  readonly startWithCreate?: boolean;
+};
 
-export function AliasesScreen({ locale, messages }: AliasesScreenProps): ReactElement {
+export function AliasesScreen({ locale, messages, startWithCreate = false }: AliasesScreenProps): ReactElement {
   const { state, ...actions } = useAliases();
-  const dialogs = useAliasDialogs(actions, messages);
+  const dialogs = useAliasDialogs(actions, messages, startWithCreate);
 
   if (state.kind === "loading") {
     return (
@@ -39,16 +45,19 @@ export function AliasesScreen({ locale, messages }: AliasesScreenProps): ReactEl
       </div>
     );
   }
-  return <AliasList locale={locale} messages={messages} aliases={state.aliases} folders={state.folders} dialogs={dialogs} />;
+  return (
+    <AliasList locale={locale} messages={messages} aliases={state.aliases} folders={state.folders} labels={state.labels} dialogs={dialogs} />
+  );
 }
 
 type AliasListProps = AliasesScreenProps & {
   readonly aliases: readonly AliasView[];
   readonly folders: readonly FolderOption[];
+  readonly labels: readonly LabelOption[];
   readonly dialogs: AliasDialogs;
 };
 
-function AliasList({ locale, messages, aliases, folders, dialogs }: AliasListProps): ReactElement {
+function AliasList({ locale, messages, aliases, folders, labels, dialogs }: AliasListProps): ReactElement {
   const text = messages.page;
   const { dialog } = dialogs;
   const editing = dialog?.kind === "edit" ? dialog.view : null;
@@ -86,8 +95,9 @@ function AliasList({ locale, messages, aliases, folders, dialogs }: AliasListPro
         key={dialog?.kind === "create" ? dialog.idempotencyKey : (editing?.alias.id ?? "form-closed")}
         mode={editing ? "edit" : "create"}
         isOpen={dialog?.kind === "create" || editing !== null}
-        initial={{ label: editing ? labelText(editing) : "", folderId: editing?.alias.folderId ?? null }}
+        initial={{ label: editing ? labelText(editing) : "", folderId: editing?.alias.folderId ?? null, labelIds: editing?.alias.labelIds ?? [] }}
         folders={folders}
+        labels={labels}
         messages={messages}
         onClose={dialogs.close}
         onSubmit={dialogs.submitForm}

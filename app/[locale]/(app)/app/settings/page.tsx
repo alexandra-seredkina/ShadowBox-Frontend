@@ -15,12 +15,18 @@ export async function generateMetadata({ params }: SettingsPageProps): Promise<M
 export default async function SettingsPage({ params }: SettingsPageProps): Promise<ReactElement> {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const { settingsPage, common, auth } = getMessages(locale);
+  const { settingsPage, common, auth, mailbox } = getMessages(locale);
 
   return (
     <SettingsScreen
       locale={locale}
-      messages={{ page: settingsPage, common, auth: { reauth: auth.reauth, errors: auth.errors, fields: auth.fields } }}
+      messages={{
+        page: settingsPage,
+        common,
+        auth: { reauth: auth.reauth, errors: auth.errors, fields: auth.fields },
+        blocked: mailbox.blocked,
+        unblockedToast: mailbox.toasts.unblocked,
+      }}
     />
   );
 }

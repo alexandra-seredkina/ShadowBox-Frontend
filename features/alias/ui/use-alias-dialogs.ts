@@ -29,9 +29,11 @@ export type AliasDialogs = {
 };
 
 /** Which dialog is open and what each button does. */
-export function useAliasDialogs(actions: Actions, messages: AliasesMessages): AliasDialogs {
+export function useAliasDialogs(actions: Actions, messages: AliasesMessages, startWithCreate: boolean): AliasDialogs {
   const showToast = useToast();
-  const [dialog, setDialog] = useState<OpenDialog | null>(null);
+  const [dialog, setDialog] = useState<OpenDialog | null>(() =>
+    startWithCreate ? { kind: "create", idempotencyKey: crypto.randomUUID() } : null,
+  );
   const [busyId, setBusyId] = useState<string | null>(null);
   const text = messages.page;
   const describe = (error: unknown): string =>
