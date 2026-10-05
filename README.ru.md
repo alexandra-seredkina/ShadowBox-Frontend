@@ -41,8 +41,6 @@ ShadowBox — анонимный почтовый ящик: регистраци
 
 ## Скриншоты
 
-### Почта
-
 <p align="center">
   <img src="public/images/screen-inbox.webp" alt="Входящие: слева папки и метки, в центре список писем, справа открытая рассылка" width="100%"><br>
   <sub>Три колонки: папки и метки, список, открытое письмо. Фишинг отмечен прямо в списке.</sub>
@@ -51,43 +49,9 @@ ShadowBox — анонимный почтовый ящик: регистраци
 <table>
   <tr>
     <td width="50%"><img src="public/images/screen-phishing.webp" alt="Фишинговое письмо: красное предупреждение с причинами и ссылка, которая показывает один сайт, а ведёт на другой"><br><sub>Предупреждение о фишинге простыми словами</sub></td>
-    <td width="50%"><img src="public/images/screen-folders.webp" alt="Папка Shopping: письма на адрес для покупок попадают сюда с меткой Receipts"><br><sub>Почта раскладывается по адресам сама</sub></td>
-  </tr>
-  <tr>
     <td width="50%"><img src="public/images/screen-addresses.webp" alt="Список адресов: у каждого своя папка и метки"><br><sub>Отдельный адрес для каждого сайта</sub></td>
-    <td width="50%"><img src="docs/screenshots/landing-tour.webp" alt="Раздел лендинга «Как это выглядит» со скриншотами почты"><br><sub>Лендинг показывает настоящий клиент</sub></td>
   </tr>
 </table>
-
-### Сайт
-
-<p align="center">
-  <img src="docs/screenshots/landing-hero.webp" alt="Главная страница: заголовок «Your mail fades into the shadow» и героиня Kage в серверном зале" width="100%">
-</p>
-
-<table>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/landing-how.webp" alt="Три шага с плоскими иллюстрациями и Kage, сидящая на конверте"></td>
-    <td width="50%"><img src="docs/screenshots/landing-security.webp" alt="Блок безопасности на арте: Kage ссыпает зашифрованные пиксели в ящик, за матовым стеклом стоят тени"></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/landing-aliases.webp" alt="Раздел про постоянные и временные адреса"></td>
-    <td width="50%"><img src="docs/screenshots/landing-phishing.webp" alt="Антифишинг: метки писем и список проверок"></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/security-intro.webp" alt="Шапка страницы безопасности: Kage на мостике с красным конвертом"></td>
-    <td width="50%"><img src="docs/screenshots/security-keys.webp" alt="Пароль и ключи: два ключа из одного пароля рядом с запечатанным стеклянным конвертом"></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/security-mail-flow.webp" alt="Страница безопасности: путь письма от отправителя до браузера"></td>
-    <td width="50%"><img src="docs/screenshots/security-threat-model.webp" alt="Что защищаем и что нет, на фоне глаз, которые рассыпаются в пиксели"></td>
-  </tr>
-</table>
-
-<p align="center">
-  <img src="docs/screenshots/mobile-languages.webp" alt="Мобильная версия на русском, английском и немецком" width="85%"><br>
-  <sub>Мобильная вёрстка на трёх языках</sub>
-</p>
 
 ## Что уже есть
 
@@ -103,19 +67,7 @@ ShadowBox — анонимный почтовый ящик: регистраци
 
 **Дальше:** отправка писем, восстановление по фразе.
 
-<table>
-  <tr>
-    <td width="50%"><img src="public/images/readme-sorted-addresses.webp" alt="Kage развешивает на крючки конверты с подписями shop, bank, forum и games; один рассыпается в красные пиксели"></td>
-    <td width="50%"><img src="public/images/readme-burn-address.webp" alt="Kage сжигает карточку временного адреса; конверты за ней летят в ящик входящих"></td>
-  </tr>
-</table>
-<p align="center"><sub>Отдельный адрес для каждого сайта, а временный сгорает сам</sub></p>
-
 ## Принципы
-
-<p align="center">
-  <img src="public/images/readme-private-reading.webp" alt="Kage читает почту на ноутбуке, а размытые фигуры за стеклом видят только пиксели" width="100%">
-</p>
 
 | | Правило | Почему |
 | --- | --- | --- |

@@ -41,8 +41,6 @@ Project goals, the threat model, the architecture and how to run the whole stack
 
 ## Screenshots
 
-### The mailbox
-
 <p align="center">
   <img src="public/images/screen-inbox.webp" alt="Inbox: folders and labels on the left, the message list in the middle, an opened newsletter on the right" width="100%"><br>
   <sub>Three panes: folders and labels, the list, the open message. Phishing is marked right in the list.</sub>
@@ -51,43 +49,9 @@ Project goals, the threat model, the architecture and how to run the whole stack
 <table>
   <tr>
     <td width="50%"><img src="public/images/screen-phishing.webp" alt="A phishing message: a red warning that explains why, and a link that shows one site but leads to another"><br><sub>A phishing warning in plain words</sub></td>
-    <td width="50%"><img src="public/images/screen-folders.webp" alt="The Shopping folder: mail to the shopping address lands here with the Receipts label"><br><sub>Mail sorts itself by address</sub></td>
-  </tr>
-  <tr>
     <td width="50%"><img src="public/images/screen-addresses.webp" alt="Address list: each address with its folder and labels"><br><sub>An address for every site</sub></td>
-    <td width="50%"><img src="docs/screenshots/landing-tour.webp" alt="Landing section “What it looks like” with screenshots of the mailbox"><br><sub>The landing page shows the real client</sub></td>
   </tr>
 </table>
-
-### The website
-
-<p align="center">
-  <img src="docs/screenshots/landing-hero.webp" alt="Landing page: the headline “Your mail fades into the shadow” and the heroine Kage in a server hall" width="100%">
-</p>
-
-<table>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/landing-how.webp" alt="Three steps with flat illustrations and Kage sitting on an envelope"></td>
-    <td width="50%"><img src="docs/screenshots/landing-security.webp" alt="Security block over art: Kage pours encrypted pixels into a box while shadows watch through frosted glass"></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/landing-aliases.webp" alt="Section about permanent and temporary addresses"></td>
-    <td width="50%"><img src="docs/screenshots/landing-phishing.webp" alt="Anti-phishing: message labels and the list of checks"></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/security-intro.webp" alt="Security page header with Kage on a walkway holding a red envelope"></td>
-    <td width="50%"><img src="docs/screenshots/security-keys.webp" alt="Password and keys: two keys from one password, next to a sealed glass envelope"></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/security-mail-flow.webp" alt="Security page: a message's path from the sender to your browser"></td>
-    <td width="50%"><img src="docs/screenshots/security-threat-model.webp" alt="What we protect and what we don't, under watching eyes that fall apart into pixels"></td>
-  </tr>
-</table>
-
-<p align="center">
-  <img src="docs/screenshots/mobile-languages.webp" alt="Mobile layout in Russian, English and German" width="85%"><br>
-  <sub>Mobile layout in three languages</sub>
-</p>
 
 ## What is already there
 
@@ -103,19 +67,7 @@ Project goals, the threat model, the architecture and how to run the whole stack
 
 **Next:** sending mail, recovery with the phrase.
 
-<table>
-  <tr>
-    <td width="50%"><img src="public/images/readme-sorted-addresses.webp" alt="Kage hangs envelopes labelled shop, bank, forum and games on hooks; one dissolves into red pixels"></td>
-    <td width="50%"><img src="public/images/readme-burn-address.webp" alt="Kage burns a temporary address card; the envelopes behind it fly into the inbox box"></td>
-  </tr>
-</table>
-<p align="center"><sub>An address for every site, and a temporary one burns out by itself</sub></p>
-
 ## Principles
-
-<p align="center">
-  <img src="public/images/readme-private-reading.webp" alt="Kage reads mail on a laptop while blurred figures peer through the glass and see only pixels" width="100%">
-</p>
 
 | | Rule | Why |
 | --- | --- | --- |

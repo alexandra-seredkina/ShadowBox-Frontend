@@ -41,8 +41,6 @@ Projektziele, Bedrohungsmodell, Architektur und der Start der gesamten Umgebung 
 
 ## Screenshots
 
-### Das Postfach
-
 <p align="center">
   <img src="public/images/screen-inbox.webp" alt="Posteingang: links Ordner und Labels, in der Mitte die Nachrichtenliste, rechts ein geöffneter Newsletter" width="100%"><br>
   <sub>Drei Spalten: Ordner und Labels, die Liste, die geöffnete Nachricht. Phishing ist schon in der Liste markiert.</sub>
@@ -51,43 +49,9 @@ Projektziele, Bedrohungsmodell, Architektur und der Start der gesamten Umgebung 
 <table>
   <tr>
     <td width="50%"><img src="public/images/screen-phishing.webp" alt="Eine Phishing-Nachricht: eine rote Warnung mit Gründen und ein Link, der eine Website zeigt, aber zu einer anderen führt"><br><sub>Phishing-Warnung in klaren Worten</sub></td>
-    <td width="50%"><img src="public/images/screen-folders.webp" alt="Der Ordner Shopping: Post an die Shopping-Adresse landet hier mit dem Label Receipts"><br><sub>Post sortiert sich nach Adresse</sub></td>
-  </tr>
-  <tr>
     <td width="50%"><img src="public/images/screen-addresses.webp" alt="Adressliste: jede Adresse mit ihrem Ordner und ihren Labels"><br><sub>Eine Adresse für jede Website</sub></td>
-    <td width="50%"><img src="docs/screenshots/landing-tour.webp" alt="Abschnitt „So sieht es aus“ auf der Startseite mit Screenshots des Postfachs"><br><sub>Die Startseite zeigt den echten Client</sub></td>
   </tr>
 </table>
-
-### Die Website
-
-<p align="center">
-  <img src="docs/screenshots/landing-hero.webp" alt="Startseite: die Überschrift „Your mail fades into the shadow“ und die Heldin Kage in einer Serverhalle" width="100%">
-</p>
-
-<table>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/landing-how.webp" alt="Drei Schritte mit flachen Illustrationen und Kage, die auf einem Umschlag sitzt"></td>
-    <td width="50%"><img src="docs/screenshots/landing-security.webp" alt="Sicherheitsblock über Artwork: Kage schüttet verschlüsselte Pixel in eine Kiste, hinter Milchglas stehen Schatten"></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/landing-aliases.webp" alt="Abschnitt über dauerhafte und temporäre Adressen"></td>
-    <td width="50%"><img src="docs/screenshots/landing-phishing.webp" alt="Anti-Phishing: Kennzeichnungen und die Liste der Prüfungen"></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/security-intro.webp" alt="Kopf der Sicherheitsseite: Kage auf einem Steg mit rotem Umschlag"></td>
-    <td width="50%"><img src="docs/screenshots/security-keys.webp" alt="Passwort und Schlüssel: zwei Schlüssel aus einem Passwort neben einem versiegelten Glasumschlag"></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/security-mail-flow.webp" alt="Sicherheitsseite: der Weg einer Nachricht vom Absender bis in deinen Browser"></td>
-    <td width="50%"><img src="docs/screenshots/security-threat-model.webp" alt="Was wir schützen und was nicht, vor Augen, die in Pixel zerfallen"></td>
-  </tr>
-</table>
-
-<p align="center">
-  <img src="docs/screenshots/mobile-languages.webp" alt="Mobile Ansicht auf Russisch, Englisch und Deutsch" width="85%"><br>
-  <sub>Mobile Ansicht in drei Sprachen</sub>
-</p>
 
 ## Was schon da ist
 
@@ -103,19 +67,7 @@ Projektziele, Bedrohungsmodell, Architektur und der Start der gesamten Umgebung 
 
 **Als Nächstes:** Post versenden, Wiederherstellung mit der Phrase.
 
-<table>
-  <tr>
-    <td width="50%"><img src="public/images/readme-sorted-addresses.webp" alt="Kage hängt Umschläge mit den Aufschriften shop, bank, forum und games an Haken; einer zerfällt in rote Pixel"></td>
-    <td width="50%"><img src="public/images/readme-burn-address.webp" alt="Kage verbrennt die Karte einer temporären Adresse; die Umschläge dahinter fliegen in die Posteingangskiste"></td>
-  </tr>
-</table>
-<p align="center"><sub>Eine Adresse für jede Website, und eine temporäre verglüht von selbst</sub></p>
-
 ## Prinzipien
-
-<p align="center">
-  <img src="public/images/readme-private-reading.webp" alt="Kage liest Post am Laptop, während verschwommene Gestalten durchs Glas schauen und nur Pixel sehen" width="100%">
-</p>
 
 | | Regel | Warum |
 | --- | --- | --- |
