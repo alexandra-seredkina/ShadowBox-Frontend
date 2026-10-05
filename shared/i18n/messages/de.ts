@@ -64,6 +64,33 @@ export const de: Messages = {
       addresses: ["Shop", "Social", "News", "Bank"],
     },
   },
+  tour: {
+    eyebrow: "Einblick",
+    title: "So sieht es aus",
+    lede: "Ein echtes Postfach: Ordner, Labels, eine Adresse für jede Website. Alles, was du hier siehst, wird im Browser entschlüsselt.",
+    shots: [
+      {
+        title: "Posteingang",
+        text: "Links Ordner und Labels, in der Mitte die Liste, rechts die geöffnete Nachricht. Phishing ist schon in der Liste markiert.",
+        alt: "ShadowBox-Posteingang mit Ordnern und Labels links, Nachrichtenliste und geöffnetem Newsletter",
+      },
+      {
+        title: "Phishing-Warnung",
+        text: "In klaren Worten, warum die Nachricht verdächtig ist und wohin jeder Link wirklich führt.",
+        alt: "Geöffnete Phishing-Nachricht mit roter Warnung und einem als getarnt markierten Link",
+      },
+      {
+        title: "Post sortiert sich selbst",
+        text: "Post an deine Shopping-Adresse landet in „Shopping“ mit dem Label „Receipts“.",
+        alt: "Der Ordner Shopping mit geöffneter Bestellbestätigung",
+      },
+      {
+        title: "Adressen",
+        text: "Jede Adresse hat ihren eigenen Ordner und ihre Labels. Eine temporäre schaltet sich selbst ab.",
+        alt: "Die Adressliste mit Ordnern und Labels für jede Adresse",
+      },
+    ],
+  },
   security: {
     eyebrow: "Sicherheit",
     title: "Der Server speichert nur verschlüsselte Post",
@@ -90,6 +117,7 @@ export const de: Messages = {
       "Vorerst empfängt das Postfach nur Nachrichten. Senden kommt in einer späteren Version.",
     ],
     more: "Mehr zum Bedrohungsmodell →",
+    imageAlt: "Eine junge Frau schüttet leuchtende rote Pixel in eine verschlossene Kiste, hinter Milchglas beobachten verschwommene Gestalten",
   },
   aliases: {
     eyebrow: "Adressen",
@@ -615,6 +643,7 @@ export const de: Messages = {
     intro: {
       eyebrow: "Sicherheit",
       title: "So funktioniert der Schutz",
+      imageAlt: "Eine junge Frau auf einem Metallsteg hält einen roten Umschlag, der in Pixel zerfällt",
       lede: "Wie eine Nachricht zu dir kommt, wer unterwegs was sehen kann und wo unser Schutz endet. Ohne große Versprechen.",
     },
     flow: {
@@ -647,6 +676,7 @@ export const de: Messages = {
     keys: {
       eyebrow: "Passwort und Schlüssel",
       title: "Dein Passwort erreicht den Server nie",
+      imageAlt: "Eine junge Frau berührt einen versiegelten Glasumschlag, daneben ein roter Schlüssel aus Pixeln",
       items: [
         {
           title: "Zwei Schlüssel aus einem Passwort",
@@ -669,6 +699,7 @@ export const de: Messages = {
     model: {
       eyebrow: "Bedrohungsmodell",
       title: "Was wir schützen und was nicht",
+      imageAlt: "Eine junge Frau zeigt auf Augen an den Wänden; eines zerfällt in rote Pixel",
       lede: "Wir gehen vom Schlimmsten aus: Angreifer kann jeder sein, der einen vollständigen Dump von Datenbank, Logs und Festplatte hat. Auch wir selbst.",
       protectsTitle: "Wir schützen",
       protects: [

@@ -6,6 +6,7 @@ import {
   PrivateReadingIllustration,
   SignUpIllustration,
 } from "./illustrations/step-illustrations";
+import { Kage } from "@/shared/ui/kage";
 import { SectionHeading } from "@/shared/ui/section-heading";
 
 export function HowItWorksSection({ messages }: { readonly messages: Messages["how"] }): ReactElement {
@@ -19,7 +20,10 @@ export function HowItWorksSection({ messages }: { readonly messages: Messages["h
   return (
     <section aria-labelledby="how" className="scroll-mt-16 border-t border-line py-20">
       <Container className="grid gap-12">
-        <SectionHeading id="how" eyebrow={messages.eyebrow} title={messages.title} />
+        <div className="flex items-end justify-between gap-6">
+          <SectionHeading id="how" eyebrow={messages.eyebrow} title={messages.title} />
+          <Kage mood="empty-inbox" className="hidden h-32 shrink-0 sm:block lg:h-40" />
+        </div>
         <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {messages.steps.map((step, index) => (
             <li key={step.title} className="grid content-start gap-4 rounded-card border border-line bg-surface p-6">

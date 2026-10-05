@@ -41,22 +41,46 @@ Project goals, the threat model, the architecture and how to run the whole stack
 
 ## Screenshots
 
+### The mailbox
+
+<p align="center">
+  <img src="public/images/screen-inbox.webp" alt="Inbox: folders and labels on the left, the message list in the middle, an opened newsletter on the right" width="100%"><br>
+  <sub>Three panes: folders and labels, the list, the open message. Phishing is marked right in the list.</sub>
+</p>
+
+<table>
+  <tr>
+    <td width="50%"><img src="public/images/screen-phishing.webp" alt="A phishing message: a red warning that explains why, and a link that shows one site but leads to another"><br><sub>A phishing warning in plain words</sub></td>
+    <td width="50%"><img src="public/images/screen-folders.webp" alt="The Shopping folder: mail to the shopping address lands here with the Receipts label"><br><sub>Mail sorts itself by address</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="public/images/screen-addresses.webp" alt="Address list: each address with its folder and labels"><br><sub>An address for every site</sub></td>
+    <td width="50%"><img src="docs/screenshots/landing-tour.webp" alt="Landing section “What it looks like” with screenshots of the mailbox"><br><sub>The landing page shows the real client</sub></td>
+  </tr>
+</table>
+
+### The website
+
 <p align="center">
   <img src="docs/screenshots/landing-hero.webp" alt="Landing page: the headline “Your mail fades into the shadow” and the heroine Kage in a server hall" width="100%">
 </p>
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/landing-how.webp" alt="Three steps with flat illustrations: sign-up, addresses, reading only on your side"></td>
-    <td width="50%"><img src="docs/screenshots/landing-security.webp" alt="Security block and the list “What we don't promise”"></td>
+    <td width="50%"><img src="docs/screenshots/landing-how.webp" alt="Three steps with flat illustrations and Kage sitting on an envelope"></td>
+    <td width="50%"><img src="docs/screenshots/landing-security.webp" alt="Security block over art: Kage pours encrypted pixels into a box while shadows watch through frosted glass"></td>
   </tr>
   <tr>
     <td width="50%"><img src="docs/screenshots/landing-aliases.webp" alt="Section about permanent and temporary addresses"></td>
     <td width="50%"><img src="docs/screenshots/landing-phishing.webp" alt="Anti-phishing: message labels and the list of checks"></td>
   </tr>
   <tr>
+    <td width="50%"><img src="docs/screenshots/security-intro.webp" alt="Security page header with Kage on a walkway holding a red envelope"></td>
+    <td width="50%"><img src="docs/screenshots/security-keys.webp" alt="Password and keys: two keys from one password, next to a sealed glass envelope"></td>
+  </tr>
+  <tr>
     <td width="50%"><img src="docs/screenshots/security-mail-flow.webp" alt="Security page: a message's path from the sender to your browser"></td>
-    <td width="50%"><img src="docs/screenshots/security-threat-model.webp" alt="Security page: what we protect and what we don't"></td>
+    <td width="50%"><img src="docs/screenshots/security-threat-model.webp" alt="What we protect and what we don't, under watching eyes that fall apart into pixels"></td>
   </tr>
 </table>
 
@@ -67,15 +91,31 @@ Project goals, the threat model, the architecture and how to run the whole stack
 
 ## What is already there
 
-- 🌐 **Landing page and security page** in English, Russian and German, with a language switcher and `hreflang`. The security page explains how mail is encrypted and is honest about what we do not protect.
+- 📬 **A three-pane mailbox** like a desktop client: folders and labels on the left, compact two-line rows, the open message on the right. On a phone the folders slide in as a drawer.
+- 🗂 **Folders and labels by address.** Pick a folder and labels for an address once, and its new mail is sorted on arrival. Starred, archive, bulk actions, search over decrypted previews.
+- 🎣 **Phishing protection you can see.** A banner with the reasons in plain words, the sender's real address, SPF, DKIM and DMARC results, the real site next to every link, links switched off in dangerous mail, warnings for programs and macro documents.
+- 🚫 **Blocking senders.** Their new mail goes straight to spam; the server keeps only a keyed hash and a copy sealed with your key.
 - 🔐 **Client-side cryptography** on libsodium: Argon2id and HKDF key derivation, X25519 key pair, encrypted private key, `EncryptedBlob` for mail and metadata, a 24-word recovery phrase. Keys live only in memory.
 - ⛏ **Proof-of-work** in a Web Worker with honest progress instead of a third-party captcha.
-- 🎨 **Design system** following the brand book: colour tokens in `@theme`, dark theme, base components (buttons, fields, threat badges, dialogs, toasts).
-- 🔌 **API client** with two implementations, `http` and `mock`. The mocks follow the API contract, including error codes and latency, so the UI can be built without a running backend.
+- 🌐 **Landing page and security page** in English, Russian and German, with a language switcher and `hreflang`.
+- 🎨 **Design system** following the brand book: colour tokens in `@theme`, hand-drawn icons, Kage stickers in empty states, on the unlock screen and at sign-up.
+- 🔌 **API client** with two implementations, `http` and `mock`. The mocks follow the API contract, so the UI can be built without a running backend.
 
-**Next:** sign-up, sign-in and unlock, addresses, folders, reading mail.
+**Next:** sending mail, recovery with the phrase.
+
+<table>
+  <tr>
+    <td width="50%"><img src="public/images/readme-sorted-addresses.webp" alt="Kage hangs envelopes labelled shop, bank, forum and games on hooks; one dissolves into red pixels"></td>
+    <td width="50%"><img src="public/images/readme-burn-address.webp" alt="Kage burns a temporary address card; the envelopes behind it fly into the inbox box"></td>
+  </tr>
+</table>
+<p align="center"><sub>An address for every site, and a temporary one burns out by itself</sub></p>
 
 ## Principles
+
+<p align="center">
+  <img src="public/images/readme-private-reading.webp" alt="Kage reads mail on a laptop while blurred figures peer through the glass and see only pixels" width="100%">
+</p>
 
 | | Rule | Why |
 | --- | --- | --- |
@@ -103,12 +143,19 @@ Project goals, the threat model, the architecture and how to run the whole stack
 app/
 ├── [locale]/              en · ru · de
 │   ├── layout.tsx         <html lang>, metadata, Open Graph
+│   ├── (app)/app/         mailbox, addresses, settings
 │   └── (marketing)/       landing, /security, header and footer
 ├── fonts/                 brand fonts + OFL licences
 └── globals.css            brand tokens
 features/
+├── alias/                 addresses, their folders and labels
+├── auth/                  sign-up, sign-in, unlock, app gate
+├── blocked-sender/        blocking senders, list in settings
 ├── crypto/                keys, EncryptedBlob, recovery phrase, PoW worker
+├── folder/ · label/       folders and labels, encrypted names
 ├── landing/ui/            landing sections and SVG illustrations
+├── mailbox/ui/            three-pane layout, sidebar, routing dialogs
+├── message/               list, open message, link and attachment checks, sandboxed frame
 └── security/ui/           security page sections and the mail-flow diagram
 shared/
 ├── api/                   http client, mocks, ApiError
@@ -153,7 +200,7 @@ CI runs them on every pull request together with Semgrep and `npm audit`.
 
 ### Images
 
-Illustrations live in `public/images/` as WebP without metadata. Markup uses them only through `next/image` with explicit sizes; if an image contains text, the same text is always next to it in HTML.
+Illustrations live in `public/images/` as WebP without metadata. Markup uses them only through `next/image` with explicit sizes; if an image contains text, the same text is always next to it in HTML. Kage stickers for empty states live in `public/stickers/` as transparent WebP; they are decorative, so their `alt` is empty and the text next to them says the same.
 
 ## License
 

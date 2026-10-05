@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import type { Messages } from "@/shared/i18n/messages";
 import { Card } from "@/shared/ui/card";
-import { Container } from "@/shared/ui/container";
+import { CoverBand } from "@/features/landing/ui/cover-band";
 import { SectionHeading } from "@/shared/ui/section-heading";
 
 type ThreatModelSectionProps = {
@@ -10,11 +10,10 @@ type ThreatModelSectionProps = {
 
 export function ThreatModelSection({ messages }: ThreatModelSectionProps): ReactElement {
   return (
-    <section aria-labelledby="model" className="border-t border-line py-20">
-      <Container className="grid gap-12">
-        <SectionHeading id="model" eyebrow={messages.eyebrow} title={messages.title}>
-          <p>{messages.lede}</p>
-        </SectionHeading>
+    <section aria-labelledby="model" className="border-t border-line pb-20">
+      <CoverBand
+        image={{ src: "/images/cover-no-trackers.webp", width: 1376, height: 768, alt: messages.imageAlt }}
+        details={
         <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
           <Card className="grid gap-4">
             <h3 className="flex items-center gap-2 font-display text-lg font-medium">
@@ -39,7 +38,12 @@ export function ThreatModelSection({ messages }: ThreatModelSectionProps): React
             </ul>
           </Card>
         </div>
-      </Container>
+        }
+      >
+        <SectionHeading id="model" eyebrow={messages.eyebrow} title={messages.title}>
+          <p>{messages.lede}</p>
+        </SectionHeading>
+      </CoverBand>
     </section>
   );
 }

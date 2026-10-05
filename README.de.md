@@ -41,22 +41,46 @@ Projektziele, Bedrohungsmodell, Architektur und der Start der gesamten Umgebung 
 
 ## Screenshots
 
+### Das Postfach
+
 <p align="center">
-  <img src="docs/screenshots/landing-hero.webp" alt="Startseite: die Überschrift „Your mail fades into the shadow“ und die Heldin Kage in einem Serverraum" width="100%">
+  <img src="public/images/screen-inbox.webp" alt="Posteingang: links Ordner und Labels, in der Mitte die Nachrichtenliste, rechts ein geöffneter Newsletter" width="100%"><br>
+  <sub>Drei Spalten: Ordner und Labels, die Liste, die geöffnete Nachricht. Phishing ist schon in der Liste markiert.</sub>
 </p>
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/landing-how.webp" alt="Drei Schritte mit flachen Illustrationen: Registrierung, Adressen, Lesen nur bei dir"></td>
-    <td width="50%"><img src="docs/screenshots/landing-security.webp" alt="Sicherheitsblock und die Liste „What we don't promise“"></td>
+    <td width="50%"><img src="public/images/screen-phishing.webp" alt="Eine Phishing-Nachricht: eine rote Warnung mit Gründen und ein Link, der eine Website zeigt, aber zu einer anderen führt"><br><sub>Phishing-Warnung in klaren Worten</sub></td>
+    <td width="50%"><img src="public/images/screen-folders.webp" alt="Der Ordner Shopping: Post an die Shopping-Adresse landet hier mit dem Label Receipts"><br><sub>Post sortiert sich nach Adresse</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="public/images/screen-addresses.webp" alt="Adressliste: jede Adresse mit ihrem Ordner und ihren Labels"><br><sub>Eine Adresse für jede Website</sub></td>
+    <td width="50%"><img src="docs/screenshots/landing-tour.webp" alt="Abschnitt „So sieht es aus“ auf der Startseite mit Screenshots des Postfachs"><br><sub>Die Startseite zeigt den echten Client</sub></td>
+  </tr>
+</table>
+
+### Die Website
+
+<p align="center">
+  <img src="docs/screenshots/landing-hero.webp" alt="Startseite: die Überschrift „Your mail fades into the shadow“ und die Heldin Kage in einer Serverhalle" width="100%">
+</p>
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/landing-how.webp" alt="Drei Schritte mit flachen Illustrationen und Kage, die auf einem Umschlag sitzt"></td>
+    <td width="50%"><img src="docs/screenshots/landing-security.webp" alt="Sicherheitsblock über Artwork: Kage schüttet verschlüsselte Pixel in eine Kiste, hinter Milchglas stehen Schatten"></td>
   </tr>
   <tr>
     <td width="50%"><img src="docs/screenshots/landing-aliases.webp" alt="Abschnitt über dauerhafte und temporäre Adressen"></td>
-    <td width="50%"><img src="docs/screenshots/landing-phishing.webp" alt="Anti-Phishing: Markierungen und die Liste der Prüfungen"></td>
+    <td width="50%"><img src="docs/screenshots/landing-phishing.webp" alt="Anti-Phishing: Kennzeichnungen und die Liste der Prüfungen"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/security-intro.webp" alt="Kopf der Sicherheitsseite: Kage auf einem Steg mit rotem Umschlag"></td>
+    <td width="50%"><img src="docs/screenshots/security-keys.webp" alt="Passwort und Schlüssel: zwei Schlüssel aus einem Passwort neben einem versiegelten Glasumschlag"></td>
   </tr>
   <tr>
     <td width="50%"><img src="docs/screenshots/security-mail-flow.webp" alt="Sicherheitsseite: der Weg einer Nachricht vom Absender bis in deinen Browser"></td>
-    <td width="50%"><img src="docs/screenshots/security-threat-model.webp" alt="Sicherheitsseite: was wir schützen und was nicht"></td>
+    <td width="50%"><img src="docs/screenshots/security-threat-model.webp" alt="Was wir schützen und was nicht, vor Augen, die in Pixel zerfallen"></td>
   </tr>
 </table>
 
@@ -67,15 +91,31 @@ Projektziele, Bedrohungsmodell, Architektur und der Start der gesamten Umgebung 
 
 ## Was schon da ist
 
-- 🌐 **Startseite und Sicherheitsseite** auf Englisch, Russisch und Deutsch mit Sprachumschalter und `hreflang`. Die Sicherheitsseite erklärt, wie Post verschlüsselt wird, und sagt ehrlich, wovor wir nicht schützen.
-- 🔐 **Kryptografie im Browser** mit libsodium: Schlüsselableitung mit Argon2id und HKDF, X25519-Schlüsselpaar, verschlüsselter privater Schlüssel, `EncryptedBlob` für Post und Metadaten, eine Recovery-Phrase aus 24 Wörtern. Schlüssel liegen nur im Speicher.
-- ⛏ **Proof-of-Work** in einem Web Worker mit ehrlichem Fortschritt statt eines Captchas von Dritten.
-- 🎨 **Designsystem** nach dem Brandbook: Farb-Tokens in `@theme`, dunkles Theme, Basiskomponenten (Buttons, Felder, Warnmarkierungen, Dialoge, Toasts).
-- 🔌 **API-Client** mit zwei Implementierungen, `http` und `mock`. Die Mocks folgen dem API-Vertrag inklusive Fehlercodes und Latenz, sodass die Oberfläche ohne laufendes Backend entsteht.
+- 📬 **Ein Postfach in drei Spalten** wie ein Desktop-Client: links Ordner und Labels, kompakte zweizeilige Zeilen, rechts die geöffnete Nachricht. Auf dem Handy gleiten die Ordner als Seitenleiste herein.
+- 🗂 **Ordner und Labels nach Adresse.** Wähle einmal Ordner und Labels für eine Adresse, und neue Post wird beim Eingang sortiert. Markiert, Archiv, Sammelaktionen, Suche in entschlüsselten Vorschauen.
+- 🎣 **Sichtbarer Phishing-Schutz.** Ein Banner mit den Gründen in klaren Worten, die echte Absenderadresse, SPF-, DKIM- und DMARC-Ergebnisse, die echte Website neben jedem Link, abgeschaltete Links in gefährlicher Post, Warnungen vor Programmen und Makro-Dokumenten.
+- 🚫 **Absender blockieren.** Ihre neue Post landet direkt im Spam; der Server speichert nur einen Hash mit Schlüssel und eine mit deinem Schlüssel versiegelte Kopie.
+- 🔐 **Kryptografie im Browser** mit libsodium: Schlüsselableitung mit Argon2id und HKDF, X25519-Schlüsselpaar, verschlüsselter privater Schlüssel, `EncryptedBlob` für Post und Metadaten, eine Wiederherstellungsphrase aus 24 Wörtern. Schlüssel leben nur im Speicher.
+- ⛏ **Proof-of-Work** in einem Web Worker mit ehrlichem Fortschritt statt eines fremden Captchas.
+- 🌐 **Startseite und Sicherheitsseite** auf Englisch, Russisch und Deutsch mit Sprachumschalter und `hreflang`.
+- 🎨 **Designsystem** nach dem Brandbook: Farbtokens in `@theme`, eigene Icons, Kage-Sticker in leeren Zuständen, beim Entsperren und bei der Registrierung.
+- 🔌 **API-Client** mit zwei Implementierungen, `http` und `mock`. Die Mocks folgen dem API-Vertrag, sodass die Oberfläche ohne laufendes Backend entsteht.
 
-**Als Nächstes:** Registrierung, Anmeldung und Entsperren, Adressen, Ordner, Post lesen.
+**Als Nächstes:** Post versenden, Wiederherstellung mit der Phrase.
+
+<table>
+  <tr>
+    <td width="50%"><img src="public/images/readme-sorted-addresses.webp" alt="Kage hängt Umschläge mit den Aufschriften shop, bank, forum und games an Haken; einer zerfällt in rote Pixel"></td>
+    <td width="50%"><img src="public/images/readme-burn-address.webp" alt="Kage verbrennt die Karte einer temporären Adresse; die Umschläge dahinter fliegen in die Posteingangskiste"></td>
+  </tr>
+</table>
+<p align="center"><sub>Eine Adresse für jede Website, und eine temporäre verglüht von selbst</sub></p>
 
 ## Prinzipien
+
+<p align="center">
+  <img src="public/images/readme-private-reading.webp" alt="Kage liest Post am Laptop, während verschwommene Gestalten durchs Glas schauen und nur Pixel sehen" width="100%">
+</p>
 
 | | Regel | Warum |
 | --- | --- | --- |
@@ -103,13 +143,20 @@ Projektziele, Bedrohungsmodell, Architektur und der Start der gesamten Umgebung 
 app/
 ├── [locale]/              en · ru · de
 │   ├── layout.tsx         <html lang>, Metadaten, Open Graph
+│   ├── (app)/app/         Postfach, Adressen, Einstellungen
 │   └── (marketing)/       Startseite, /security, Kopf- und Fußzeile
 ├── fonts/                 Markenschriften + OFL-Lizenzen
 └── globals.css            Marken-Tokens
 features/
-├── crypto/                Schlüssel, EncryptedBlob, Recovery-Phrase, PoW-Worker
+├── alias/                 Adressen, ihre Ordner und Labels
+├── auth/                  Registrierung, Anmeldung, Entsperren, App-Schutz
+├── blocked-sender/        Absender blockieren, Liste in den Einstellungen
+├── crypto/                Schlüssel, EncryptedBlob, Wiederherstellungsphrase, PoW-Worker
+├── folder/ · label/       Ordner und Labels, verschlüsselte Namen
 ├── landing/ui/            Abschnitte der Startseite und SVG-Illustrationen
-└── security/ui/           Abschnitte der Sicherheitsseite und das Diagramm des Nachrichtenwegs
+├── mailbox/ui/            drei Spalten, Seitenleiste, Zuordnungsdialoge
+├── message/               Liste, geöffnete Nachricht, Link- und Anhangsprüfung, isolierter Frame
+└── security/ui/           Abschnitte der Sicherheitsseite und das Postweg-Diagramm
 shared/
 ├── api/                   HTTP-Client, Mocks, ApiError
 ├── config/                öffentliche Umgebungsvariablen
@@ -153,7 +200,7 @@ Die CI führt sie bei jedem Pull Request zusammen mit Semgrep und `npm audit` au
 
 ### Bilder
 
-Illustrationen liegen in `public/images/` als WebP ohne Metadaten. Im Markup nur über `next/image` mit expliziten Größen; enthält ein Bild Text, steht derselbe Text immer daneben im HTML.
+Illustrationen liegen in `public/images/` als WebP ohne Metadaten. Im Markup nur über `next/image` mit expliziten Größen; enthält ein Bild Text, steht derselbe Text immer daneben im HTML. Kage-Sticker für leere Zustände liegen in `public/stickers/` als transparentes WebP; sie sind dekorativ, daher ist `alt` leer und der Text daneben sagt dasselbe.
 
 ## Lizenz
 

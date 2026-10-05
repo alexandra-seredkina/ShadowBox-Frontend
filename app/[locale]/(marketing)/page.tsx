@@ -6,6 +6,7 @@ import { HeroSection } from "@/features/landing/ui/hero-section";
 import { HowItWorksSection } from "@/features/landing/ui/how-it-works-section";
 import { PhishingSection } from "@/features/landing/ui/phishing-section";
 import { SecuritySection } from "@/features/landing/ui/security-section";
+import { TourSection } from "@/features/landing/ui/tour-section";
 import { isLocale } from "@/shared/i18n/locales";
 import { getMessages } from "@/shared/i18n/messages";
 
@@ -20,6 +21,7 @@ export default async function HomePage({ params }: HomePageProps): Promise<React
     <>
       <HeroSection locale={locale} messages={messages.hero} />
       <HowItWorksSection messages={messages.how} />
+      <TourSection messages={messages.tour} />
       <SecuritySection locale={locale} messages={messages.security} />
       <AliasesSection messages={messages.aliases} />
       <PhishingSection messages={messages.phishing} />

@@ -64,6 +64,33 @@ export const en: Messages = {
       addresses: ["Shop", "Social", "News", "Bank"],
     },
   },
+  tour: {
+    eyebrow: "Inside",
+    title: "What it looks like",
+    lede: "A real mailbox: folders, labels, an address for every site. Everything you see here is decrypted in the browser.",
+    shots: [
+      {
+        title: "Inbox",
+        text: "Folders and labels on the left, the list in the middle, the open message on the right. Phishing is marked right in the list.",
+        alt: "ShadowBox inbox with folders and labels on the left, a message list and an opened newsletter",
+      },
+      {
+        title: "A phishing warning",
+        text: "Why the message is suspicious, in plain words, and where each link really goes.",
+        alt: "An opened phishing message with a red warning and a link marked as disguised",
+      },
+      {
+        title: "Mail sorts itself",
+        text: "Mail to your shopping address lands in “Shopping” with the “Receipts” label.",
+        alt: "The Shopping folder with an order confirmation opened",
+      },
+      {
+        title: "Addresses",
+        text: "Each address has its own folder and labels. A temporary one switches off by itself.",
+        alt: "The address list with folders and labels for each address",
+      },
+    ],
+  },
   security: {
     eyebrow: "Security",
     title: "The server only stores encrypted mail",
@@ -90,6 +117,7 @@ export const en: Messages = {
       "For now the inbox only receives mail. Sending comes in a later version.",
     ],
     more: "More about the threat model →",
+    imageAlt: "A young woman pours glowing red pixels into a locked box while blurred figures watch through frosted glass",
   },
   aliases: {
     eyebrow: "Addresses",
@@ -607,6 +635,7 @@ export const en: Messages = {
     intro: {
       eyebrow: "Security",
       title: "How protection works",
+      imageAlt: "A young woman on a metal walkway holds a red envelope that dissolves into pixels",
       lede: "How a message reaches you, who can see what along the way, and where our protection ends. No big promises.",
     },
     flow: {
@@ -639,6 +668,7 @@ export const en: Messages = {
     keys: {
       eyebrow: "Password and keys",
       title: "Your password never reaches the server",
+      imageAlt: "A young woman touches a sealed glass envelope with a red key made of pixels beside it",
       items: [
         {
           title: "Two keys from one password",
@@ -661,6 +691,7 @@ export const en: Messages = {
     model: {
       eyebrow: "Threat model",
       title: "What we protect and what we don't",
+      imageAlt: "A young woman points at watching eyes on the walls; one of them breaks apart into red pixels",
       lede: "We assume the worst: the adversary may be anyone who got a full dump of the database, logs and disk. Including us.",
       protectsTitle: "We protect",
       protects: [
