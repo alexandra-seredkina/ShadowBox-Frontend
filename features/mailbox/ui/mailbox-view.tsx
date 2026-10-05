@@ -21,7 +21,7 @@ import { localizePath, type Locale } from "@/shared/i18n/locales";
 import { joinClassNames } from "@/shared/lib/class-names";
 import { ButtonLink } from "@/shared/ui/button";
 import { EmptyState } from "@/shared/ui/empty-state";
-import { MailOpenIcon } from "@/shared/ui/icons";
+import { Kage } from "@/shared/ui/kage";
 import { Spinner } from "@/shared/ui/spinner";
 import { useToast } from "@/shared/ui/toast";
 import { MailboxList } from "./mailbox-list";
@@ -95,6 +95,7 @@ export function MailboxView({ locale, target, messages }: MailboxViewProps): Rea
     const text = messages.folders.missing;
     return (
       <EmptyState
+        illustration={<Kage mood="lost" />}
         title={text.title}
         description={text.text}
         action={<ButtonLink href={localizePath(locale, "/app/f/inbox")}>{text.back}</ButtonLink>}
@@ -252,9 +253,7 @@ function PanePlaceholder({ messages }: { readonly messages: MailboxMessages }): 
   return (
     <div className="grid h-full place-items-center p-10">
       <div className="grid max-w-xs justify-items-center gap-3 text-center">
-        <span className="grid size-14 place-items-center rounded-card border border-line text-fog">
-          <MailOpenIcon className="size-6" />
-        </span>
+        <Kage mood="reading" className="h-36" />
         <p className="font-display text-base text-paper">{text.title}</p>
         <p className="text-sm text-fog">{text.text}</p>
       </div>

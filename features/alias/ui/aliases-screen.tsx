@@ -8,6 +8,7 @@ import type { LabelOption } from "@/features/label/model/label-option";
 import type { Locale } from "@/shared/i18n/locales";
 import { Button } from "@/shared/ui/button";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { Kage } from "@/shared/ui/kage";
 import { Spinner } from "@/shared/ui/spinner";
 import { describeAliasError } from "../model/alias-error";
 import { labelText, type AliasView } from "../model/alias-view";
@@ -64,7 +65,7 @@ function AliasList({ locale, messages, aliases, folders, labels, dialogs }: Alia
   const revoking = dialog?.kind === "revoke" || dialog?.kind === "reauth" ? dialog.view : null;
 
   return (
-    <div className="mx-auto grid w-full max-w-3xl gap-8 py-10">
+    <div className="mx-auto grid w-full max-w-5xl gap-8 py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="grid gap-2">
           <h1 className="font-display text-2xl font-medium sm:text-3xl">{text.title}</h1>
@@ -74,14 +75,15 @@ function AliasList({ locale, messages, aliases, folders, labels, dialogs }: Alia
       </div>
 
       {aliases.length === 0 ? (
-        <EmptyState title={text.empty.title} description={text.empty.text} />
+        <EmptyState illustration={<Kage mood="first-address" />} title={text.empty.title} description={text.empty.text} />
       ) : (
-        <ul className="grid gap-4">
+        <ul className="grid gap-4 md:grid-cols-2">
           {aliases.map((view) => (
             <AliasCard
               key={view.alias.id}
               view={view}
               folders={folders}
+              labels={labels}
               locale={locale}
               messages={messages}
               isBusy={dialogs.busyId === view.alias.id}

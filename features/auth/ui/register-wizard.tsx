@@ -8,6 +8,7 @@ import type { Messages } from "@/shared/i18n/messages";
 import { describeAuthError, isLoginRejection } from "../model/auth-error";
 import { pickCheckPositions } from "../model/phrase-check";
 import { completeRegistration, prepareRegistration, type PreparedRegistration, type RegistrationTicket } from "../model/register";
+import { Kage } from "@/shared/ui/kage";
 import { AuthCard } from "./auth-card";
 import { PowProgress } from "./pow-progress";
 import { RecoveryPhraseCheck } from "./recovery-phrase-check";
@@ -99,7 +100,7 @@ export function RegisterWizard({ locale, messages, common }: RegisterWizardProps
       );
     case "phrase":
       return (
-        <AuthCard title={text.phrase.title} lede={text.phrase.text} header={header}>
+        <AuthCard title={text.phrase.title} lede={text.phrase.text} header={header} mascot={<Kage mood="recovery" className="h-24" />}>
           <RecoveryPhraseView
             words={state.ready.prepared.recoveryWords}
             messages={text.phrase}

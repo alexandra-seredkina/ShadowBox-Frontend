@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
+import { joinClassNames } from "@/shared/lib/class-names";
 import { Card } from "@/shared/ui/card";
 
 type AuthCardProps = {
@@ -8,12 +9,15 @@ type AuthCardProps = {
   readonly header?: ReactNode;
   readonly children: ReactNode;
   readonly footer?: ReactNode;
+  /** A sticker peeking over the card's top edge. */
+  readonly mascot?: ReactNode;
 };
 
-export function AuthCard({ title, lede, header, children, footer }: AuthCardProps): ReactElement {
+export function AuthCard({ title, lede, header, children, footer, mascot }: AuthCardProps): ReactElement {
   return (
-    <div className="mx-auto grid w-full max-w-md gap-6">
-      <Card className="grid gap-6 p-6 sm:p-8">
+    <div className={joinClassNames("mx-auto grid w-full max-w-md gap-6", mascot ? "mt-20" : null)}>
+      <Card className="relative grid gap-6 p-6 sm:p-8">
+        {mascot ? <div className="pointer-events-none absolute right-6 bottom-full -mb-2">{mascot}</div> : null}
         {header}
         <div className="grid gap-2">
           <h1 className="font-display text-2xl font-medium text-balance">{title}</h1>

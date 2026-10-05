@@ -12,6 +12,7 @@ import { Spinner } from "@/shared/ui/spinner";
 import { describeAuthError } from "../model/auth-error";
 import { signOut, unlock } from "../model/sign-in";
 import { useSessionCheck } from "../model/use-session-check";
+import { Kage } from "@/shared/ui/kage";
 import { AuthCard } from "./auth-card";
 import { FormError } from "./form-error";
 
@@ -64,7 +65,7 @@ export function UnlockForm({ locale, messages, common }: UnlockFormProps): React
   }
 
   return (
-    <AuthCard title={text.title} lede={text.lede}>
+    <AuthCard title={text.title} lede={text.lede} mascot={<Kage mood="unlock" className="h-24" />}>
       <form noValidate onSubmit={(event) => void submit(event)} className="grid gap-5">
         {session.kind === "signed-in" ? (
           <p className="font-mono text-sm text-fog">{formatMessage(text.signedInAs, { login: session.login })}</p>

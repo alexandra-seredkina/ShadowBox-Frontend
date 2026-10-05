@@ -18,6 +18,7 @@ import { localizePath, type Locale } from "@/shared/i18n/locales";
 import { ButtonLink } from "@/shared/ui/button";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { IconButton } from "@/shared/ui/icon-button";
+import { Kage, type KageMood } from "@/shared/ui/kage";
 import { MenuIcon, SearchIcon } from "@/shared/ui/icons";
 import { Spinner } from "@/shared/ui/spinner";
 import { useToast } from "@/shared/ui/toast";
@@ -182,7 +183,7 @@ function ListBody(props: ListBodyProps): ReactElement {
         {state.rows.length === 0 ? (
           <EmptyMailbox mailbox={mailbox} locale={locale} messages={messages} />
         ) : rows.length === 0 ? (
-          <p className="py-10 text-center text-sm text-steel">{messages.mail.noResults}</p>
+          <EmptyState illustration={<Kage mood="search" className="h-24" />} title={messages.mail.noResults} />
         ) : (
           <ul aria-label={messages.mail.listLabel}>
             {rows.map((row) => (
@@ -228,13 +229,28 @@ function ListBody(props: ListBodyProps): ReactElement {
   );
 }
 
+const EMPTY_MOODS: Readonly<Record<NonNullable<FolderOption["systemRole"]> | "custom", KageMood>> = {
+  inbox: "empty-inbox",
+  archive: "empty-inbox",
+  spam: "no-spam",
+  trash: "empty-trash",
+  custom: "first-address",
+};
+
 function EmptyMailbox({ mailbox, locale, messages }: { readonly mailbox: ResolvedMailbox; readonly locale: Locale; readonly messages: MailboxMessages }): ReactElement {
-  if (mailbox.scope.kind === "starred") return <EmptyState title={messages.mailbox.empty.starred.title} description={messages.mailbox.empty.starred.text} />;
-  if (mailbox.scope.kind === "label") return <EmptyState title={messages.mailbox.empty.label.title} description={messages.mailbox.empty.label.text} />;
+  if (mailbox.scope.kind === "starred") {
+    const text = messages.mailbox.empty.starred;
+    return <EmptyState illustration={<Kage mood="starred" />} title={text.title} description={text.text} />;
+  }
+  if (mailbox.scope.kind === "label") {
+    const text = messages.mailbox.empty.label;
+    return <EmptyState illustration={<Kage mood="first-address" />} title={text.title} description={text.text} />;
+  }
   const role = mailbox.folder?.systemRole ?? "custom";
   const empty = messages.mail.empty[role];
   return (
     <EmptyState
+      illustration={<Kage mood={EMPTY_MOODS[role]} />}
       title={empty.title}
       description={empty.text}
       action={

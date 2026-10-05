@@ -6,6 +6,7 @@ import { FALLBACK_LOCALE, isLocale, localizePath } from "@/shared/i18n/locales";
 import { getMessages } from "@/shared/i18n/messages";
 import { ButtonLink } from "@/shared/ui/button";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { Kage } from "@/shared/ui/kage";
 
 // Next.js passes no props to not-found, so the locale is read from the URL on the client.
 export default function NotFound(): ReactElement {
@@ -18,7 +19,12 @@ export default function NotFound(): ReactElement {
       <EmptyState
         title={messages.title}
         description={messages.text}
-        illustration={<p className="font-mono text-5xl text-red">404</p>}
+        illustration={
+          <>
+            <Kage mood="lost" className="h-36" />
+            <p className="font-mono text-3xl text-red">404</p>
+          </>
+        }
         action={<ButtonLink href={localizePath(locale, "/")}>{messages.home}</ButtonLink>}
       />
     </main>
