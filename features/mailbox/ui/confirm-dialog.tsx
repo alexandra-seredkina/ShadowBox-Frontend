@@ -1,22 +1,24 @@
 "use client";
 
-import { useState, type ReactElement } from "react";
+import { useState, type ReactElement, type ReactNode } from "react";
 import { FormError } from "@/features/auth/ui/form-error";
-import { formatMessage } from "@/shared/i18n/format-message";
 import { Button } from "@/shared/ui/button";
 import { Dialog } from "@/shared/ui/dialog";
-import type { Messages } from "@/shared/i18n/messages";
 
-type DeleteMessagesDialogProps = {
+type ConfirmDialogProps = {
   readonly isOpen: boolean;
-  readonly count: number;
-  readonly messages: Messages["mail"]["delete"];
+  readonly title: string;
+  readonly description: string;
+  readonly confirmLabel: string;
+  readonly cancelLabel: string;
+  readonly children?: ReactNode;
   readonly onClose: () => void;
   /** Resolves to an error message to show, or null when the dialog may close. */
   readonly onConfirm: () => Promise<string | null>;
 };
 
-export function DeleteMessagesDialog({ isOpen, count, messages, onClose, onConfirm }: DeleteMessagesDialogProps): ReactElement {
+export function ConfirmDialog(props: ConfirmDialogProps): ReactElement {
+  const { isOpen, title, description, confirmLabel, cancelLabel, children, onClose, onConfirm } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,15 +30,16 @@ export function DeleteMessagesDialog({ isOpen, count, messages, onClose, onConfi
   }
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title={messages.title} description={formatMessage(messages.text, { count })}>
+    <Dialog isOpen={isOpen} onClose={onClose} title={title} description={description}>
       <div className="grid gap-5">
+        {children}
         <FormError message={error} />
         <div className="flex flex-wrap justify-end gap-3">
           <Button variant="ghost" disabled={isSubmitting} onClick={onClose}>
-            {messages.cancel}
+            {cancelLabel}
           </Button>
           <Button disabled={isSubmitting} onClick={() => void confirm()}>
-            {messages.confirm}
+            {confirmLabel}
           </Button>
         </div>
       </div>

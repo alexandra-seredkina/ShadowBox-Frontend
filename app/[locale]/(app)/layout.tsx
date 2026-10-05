@@ -20,14 +20,14 @@ export default async function AppLayout({ children, params }: AppLayoutProps): P
 
   return (
     <ToastProvider>
-      <div className="grid min-h-dvh grid-rows-[auto_1fr]">
+      <div className="flex h-dvh flex-col">
         <AppHeader
           locale={locale}
           messages={messages.appNav}
           homeLabel={messages.auth.homeLabel}
           languageLabel={messages.header.languageLabel}
         />
-        <main id="content" className="px-4">
+        <main id="content" className="min-h-0 flex-1 overflow-y-auto px-4">
           <AppGate locale={locale} loadingLabel={messages.common.loading} checkingText={messages.auth.app.checking}>
             {children}
           </AppGate>

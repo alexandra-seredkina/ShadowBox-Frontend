@@ -1,87 +1,227 @@
 "use client";
 
-import { useEffect, useRef, type ReactElement } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
 import { folderName } from "@/features/folder/model/folder-name";
 import type { FolderOption } from "@/features/folder/model/folder-option";
+import type { LabelOption } from "@/features/label/model/label-option";
 import { formatMessage } from "@/shared/i18n/format-message";
-import { joinClassNames } from "@/shared/lib/class-names";
+import type { Messages } from "@/shared/i18n/messages";
 import { Button } from "@/shared/ui/button";
-import { INPUT_CLASS_NAME } from "@/shared/ui/input";
+import { IconButton } from "@/shared/ui/icon-button";
+import {
+  ArchiveIcon,
+  FolderIcon,
+  InboxIcon,
+  MailIcon,
+  MailOpenIcon,
+  MoveIcon,
+  PlusIcon,
+  RefreshIcon,
+  SpamIcon,
+  StarIcon,
+  TagIcon,
+  TrashIcon,
+} from "@/shared/ui/icons";
+import { MenuItem, Popover } from "@/shared/ui/popover";
 import type { MessageChange } from "../model/message-row";
-import type { MailMessages } from "./mail-messages";
 
-const TOOL_CLASS_NAME = "h-9 px-3";
-const DESTRUCTIVE_TOOL_CLASS_NAME = "h-9 px-3 hover:border-red hover:text-red-soft";
+type ToolbarMessages = {
+  readonly toolbar: Messages["mailbox"]["toolbar"];
+  readonly folders: Messages["folders"];
+  readonly unnamedLabel: string;
+};
+
+/** What the label picker should add and take off, from the checkboxes the user changed. */
+export type LabelEdit = { readonly add: readonly string[]; readonly remove: readonly string[] };
 
 type MessageToolbarProps = {
-  readonly folder: FolderOption;
-  /** Every folder, sorted for display; the open one is left out of "Move to". */
+  /** The open folder, when the list shows one; cross-folder views have none. */
+  readonly folder: FolderOption | null;
+  /** Every folder, sorted for display. */
   readonly folders: readonly FolderOption[];
+  readonly labels: readonly LabelOption[];
+  /** Label ids of each selected message, to show which labels they share. */
+  readonly selectedLabelIds: readonly (readonly string[])[];
+  readonly areAllStarred: boolean;
   readonly selectedCount: number;
   readonly loadedCount: number;
   readonly isBusy: boolean;
-  readonly messages: MailMessages;
+  readonly messages: ToolbarMessages;
   readonly onSelectAll: (isSelected: boolean) => void;
   readonly onChange: (change: MessageChange) => void;
+  readonly onLabels: (edit: LabelEdit) => void;
+  readonly onCreateLabel: () => void;
   readonly onDeleteForever: () => void;
+  readonly onRefresh: () => void;
 };
 
 export function MessageToolbar(props: MessageToolbarProps): ReactElement {
-  const { folder, folders, selectedCount, loadedCount, isBusy, messages, onChange } = props;
-  const text = messages.mail;
-  const inbox = folders.find((option) => option.systemRole === "inbox");
-  const trash = folders.find((option) => option.systemRole === "trash");
-  const hasSelection = selectedCount > 0;
+  const { folder, folders, labels, selectedCount, loadedCount, isBusy, messages, onChange } = props;
+  const text = messages.toolbar;
+  const find = (role: FolderOption["systemRole"]): FolderOption | undefined => folders.find((option) => option.systemRole === role);
+  const inbox = find("inbox");
+  const archive = find("archive");
+  const spam = find("spam");
+  const trash = find("trash");
+  const role = folder?.systemRole ?? null;
+  const isIdle = isBusy;
+  const move = (target: FolderOption | undefined): void => {
+    if (target) onChange({ action: "move", folderId: target.id });
+  };
 
   return (
-    <div className="sticky top-0 z-10 -mx-2 flex min-h-14 flex-wrap items-center gap-2 border-b border-line bg-night/95 px-2 py-2 backdrop-blur sm:-mx-3 sm:px-3">
+    <div role="toolbar" aria-label={text.label} className="flex min-h-12 items-center gap-0.5 border-b border-line px-1.5">
       <SelectAll selectedCount={selectedCount} loadedCount={loadedCount} label={text.selectAll} onChange={props.onSelectAll} />
-      {hasSelection ? (
-        <div role="group" aria-label={text.toolbarLabel} className="flex flex-wrap items-center gap-2">
-          <span className="font-mono text-xs text-steel" aria-live="polite">
-            {formatMessage(text.selected, { count: selectedCount })}
-          </span>
-          <Button variant="ghost" disabled={isBusy} onClick={() => onChange({ action: "markRead" })} className={TOOL_CLASS_NAME}>
-            {text.actions.markRead}
-          </Button>
-          <Button variant="ghost" disabled={isBusy} onClick={() => onChange({ action: "markUnread" })} className={TOOL_CLASS_NAME}>
-            {text.actions.markUnread}
-          </Button>
-          <select
-            aria-label={text.actions.moveLabel}
-            value=""
-            disabled={isBusy}
-            onChange={(event) => onChange({ action: "move", folderId: event.target.value })}
-            className={joinClassNames(INPUT_CLASS_NAME, "h-9 w-auto max-w-48 text-sm")}
-          >
-            <option value="" disabled>
-              {text.actions.moveTo}
-            </option>
-            {folders
-              .filter((option) => option.id !== folder.id)
-              .map((option) => (
-                <option key={option.id} value={option.id}>
-                  {folderName(option, messages.folders)}
-                </option>
-              ))}
-          </select>
-          {folder.systemRole === "spam" && inbox ? (
-            <Button variant="ghost" disabled={isBusy} onClick={() => onChange({ action: "move", folderId: inbox.id })} className={TOOL_CLASS_NAME}>
-              {text.actions.notSpam}
-            </Button>
-          ) : null}
-          {folder.systemRole === "trash" || !trash ? (
-            <Button variant="ghost" disabled={isBusy} onClick={props.onDeleteForever} className={DESTRUCTIVE_TOOL_CLASS_NAME}>
-              {text.actions.deleteForever}
-            </Button>
+      {selectedCount > 0 ? (
+        <>
+          <IconButton label={text.markRead} icon={<MailOpenIcon />} disabled={isIdle} onClick={() => onChange({ action: "markRead" })} />
+          <IconButton label={text.markUnread} icon={<MailIcon />} disabled={isIdle} onClick={() => onChange({ action: "markUnread" })} />
+          <IconButton
+            label={props.areAllStarred ? text.unstar : text.star}
+            icon={<StarIcon isFilled={props.areAllStarred && selectedCount > 0} />}
+            disabled={isIdle}
+            onClick={() => onChange({ action: props.areAllStarred ? "unstar" : "star" })}
+          />
+          {role !== "archive" ? <IconButton label={text.archive} icon={<ArchiveIcon />} disabled={isIdle} onClick={() => move(archive)} /> : null}
+          {role === "spam" ? (
+            <IconButton label={text.notSpam} icon={<InboxIcon />} disabled={isIdle} onClick={() => move(inbox)} />
           ) : (
-            <Button variant="ghost" disabled={isBusy} onClick={() => onChange({ action: "move", folderId: trash.id })} className={DESTRUCTIVE_TOOL_CLASS_NAME}>
-              {text.actions.toTrash}
-            </Button>
+            <IconButton label={text.spam} icon={<SpamIcon />} disabled={isIdle} onClick={() => move(spam)} />
           )}
-        </div>
+          {role === "trash" ? (
+            <IconButton label={text.deleteForever} icon={<TrashIcon />} tone="danger" disabled={isIdle} onClick={props.onDeleteForever} />
+          ) : (
+            <IconButton label={text.toTrash} icon={<TrashIcon />} tone="danger" disabled={isIdle} onClick={() => move(trash)} />
+          )}
+          <span aria-hidden className="mx-1 h-5 w-px bg-line" />
+          <Popover trigger={(trigger) => <IconButton {...trigger} label={text.moveTo} icon={<MoveIcon />} disabled={isIdle} />}>
+            {(close) =>
+              folders
+                .filter((option) => option.id !== folder?.id)
+                .map((option) => (
+                  <MenuItem
+                    key={option.id}
+                    icon={<FolderIcon />}
+                    onSelect={() => {
+                      close();
+                      move(option);
+                    }}
+                  >
+                    {folderName(option, messages.folders)}
+                  </MenuItem>
+                ))
+            }
+          </Popover>
+          <Popover trigger={(trigger) => <IconButton {...trigger} label={text.labelAs} icon={<TagIcon />} disabled={isIdle} />}>
+            {(close) => (
+              <LabelPicker
+                labels={labels}
+                selectedLabelIds={props.selectedLabelIds}
+                messages={messages}
+                onApply={(edit) => {
+                  close();
+                  props.onLabels(edit);
+                }}
+                onCreate={() => {
+                  close();
+                  props.onCreateLabel();
+                }}
+              />
+            )}
+          </Popover>
+        </>
       ) : null}
+      <span className="ml-auto flex items-center gap-1">
+        <span className="sr-only font-mono text-xs text-steel 2xl:not-sr-only" aria-live="polite">
+          {selectedCount > 0 ? formatMessage(text.selected, { count: selectedCount }) : null}
+        </span>
+        {selectedCount === 0 ? <IconButton label={text.refresh} icon={<RefreshIcon />} onClick={props.onRefresh} /> : null}
+      </span>
     </div>
+  );
+}
+
+type LabelPickerProps = {
+  readonly labels: readonly LabelOption[];
+  readonly selectedLabelIds: readonly (readonly string[])[];
+  readonly messages: ToolbarMessages;
+  readonly onApply: (edit: LabelEdit) => void;
+  readonly onCreate: () => void;
+};
+
+type LabelState = "all" | "some" | "none";
+
+function stateOf(labelId: string, selected: readonly (readonly string[])[]): LabelState {
+  const count = selected.filter((ids) => ids.includes(labelId)).length;
+  if (count === 0) return "none";
+  return count === selected.length ? "all" : "some";
+}
+
+/** Checkboxes per label: a dash means some of the selected messages have it. */
+export function LabelPicker({ labels, selectedLabelIds, messages, onApply, onCreate }: LabelPickerProps): ReactElement {
+  const [wanted, setWanted] = useState<ReadonlyMap<string, boolean>>(new Map());
+  const text = messages.toolbar;
+
+  function apply(): void {
+    const add: string[] = [];
+    const remove: string[] = [];
+    for (const [labelId, isWanted] of wanted) (isWanted ? add : remove).push(labelId);
+    onApply({ add, remove });
+  }
+
+  return (
+    <div className="grid w-64 gap-1">
+      {labels.length === 0 ? <p className="px-2.5 py-2 text-sm text-fog">{text.noLabels}</p> : null}
+      <ul className="grid max-h-64 gap-0.5 overflow-y-auto">
+        {labels.map((label) => (
+          <li key={label.id}>
+            <LabelCheckbox
+              label={label}
+              name={label.name ?? messages.unnamedLabel}
+              state={stateOf(label.id, selectedLabelIds)}
+              wanted={wanted.get(label.id)}
+              onChange={(isWanted) => setWanted((current) => new Map(current).set(label.id, isWanted))}
+            />
+          </li>
+        ))}
+      </ul>
+      <div className="flex items-center justify-between gap-2 border-t border-line pt-1.5">
+        <button type="button" onClick={onCreate} className="inline-flex items-center gap-1.5 rounded-control px-2 py-1.5 text-sm text-steel hover:text-paper">
+          <PlusIcon className="size-4" />
+          {text.createLabel}
+        </button>
+        <Button disabled={wanted.size === 0} onClick={apply} className="h-8 px-3">
+          {text.apply}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+type LabelCheckboxProps = {
+  readonly label: LabelOption;
+  readonly name: string;
+  readonly state: LabelState;
+  readonly wanted: boolean | undefined;
+  readonly onChange: (isWanted: boolean) => void;
+};
+
+function LabelCheckbox({ label, name, state, wanted, onChange }: LabelCheckboxProps): ReactElement {
+  const ref = useRef<HTMLInputElement>(null);
+  const isChecked = wanted ?? state === "all";
+  const isMixed = wanted === undefined && state === "some";
+
+  // `indeterminate` exists only as a DOM property, not as an attribute React can set.
+  useEffect(() => {
+    if (ref.current) ref.current.indeterminate = isMixed;
+  }, [isMixed]);
+
+  return (
+    <label className="flex cursor-pointer items-center gap-2.5 rounded-control px-2.5 py-2 text-sm hover:bg-surface-2">
+      <input ref={ref} type="checkbox" checked={isChecked} onChange={(event) => onChange(event.target.checked)} className="size-4 accent-red" />
+      <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: label.color }} />
+      <span className="min-w-0 flex-1 truncate">{name}</span>
+    </label>
   );
 }
 
@@ -102,14 +242,14 @@ function SelectAll({ selectedCount, loadedCount, label, onChange }: SelectAllPro
   }, [selectedCount, isAll]);
 
   return (
-    <label className="flex items-center gap-2 px-0 text-sm text-steel">
+    <label className="grid size-9 cursor-pointer place-items-center">
       <input
         ref={ref}
         type="checkbox"
         checked={isAll}
         disabled={loadedCount === 0}
         onChange={(event) => onChange(event.target.checked)}
-        className="size-4.5 accent-red"
+        className="size-4 accent-red"
       />
       <span className="sr-only">{label}</span>
     </label>

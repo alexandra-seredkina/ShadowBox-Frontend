@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ReactElement } from "react";
-import { MessageView } from "@/features/message/ui/message-view";
+import { MessageRedirect } from "@/features/mailbox/ui/message-redirect";
 import { isLocale } from "@/shared/i18n/locales";
 import { getMessages } from "@/shared/i18n/messages";
 
@@ -15,11 +15,13 @@ export async function generateMetadata({ params }: MessagePageProps): Promise<Me
 export default async function MessagePage({ params }: MessagePageProps): Promise<ReactElement> {
   const { locale, messageId } = await params;
   if (!isLocale(locale)) notFound();
-  const { mail, folders, common, auth } = getMessages(locale);
+  const { mailbox, mail, folders, common, auth } = getMessages(locale);
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-8">
-      <MessageView messageId={decodeURIComponent(messageId)} locale={locale} messages={{ mail, folders, common, errors: auth.errors }} />
-    </div>
+    <MessageRedirect
+      messageId={decodeURIComponent(messageId)}
+      locale={locale}
+      messages={{ mailbox, mail, folders, common, errors: auth.errors }}
+    />
   );
 }

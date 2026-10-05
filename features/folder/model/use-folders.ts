@@ -20,6 +20,8 @@ export type Folders = {
   readonly remove: (folder: FolderOption) => Promise<void>;
   /** Mail actions already know how counts change; this saves a refetch of the folder list. */
   readonly adjustUnread: (delta: ReadonlyMap<string, number>) => void;
+  /** Fetches the list again, for mail that arrived since. */
+  readonly refresh: () => void;
 };
 
 function requireKeys(): KeyPair {
@@ -39,6 +41,7 @@ async function sealRequiredName(name: string): Promise<EncryptedBlob> {
 /** The folder list plus actions that keep it in step with the server. */
 export function useFolders(): Folders {
   const [state, setState] = useState<FoldersState>({ kind: "loading" });
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let isCurrent = true;
@@ -50,13 +53,14 @@ export function useFolders(): Folders {
           if (isCurrent) setState({ kind: "ready", folders });
         },
         (error: unknown) => {
-          if (isCurrent) setState({ kind: "failed", error });
+          // A failed refresh keeps the folders already on screen.
+          if (isCurrent) setState((current) => (current.kind === "ready" ? current : { kind: "failed", error }));
         },
       );
     return () => {
       isCurrent = false;
     };
-  }, []);
+  }, [version]);
 
   const put = useCallback(async (folder: Folder): Promise<FolderOption> => {
     const option = await toFolderOption(folder, requireKeys());
@@ -101,5 +105,7 @@ export function useFolders(): Folders {
     });
   }, []);
 
-  return { state, create, rename, remove, adjustUnread };
+  const refresh = useCallback(() => setVersion((current) => current + 1), []);
+
+  return { state, create, rename, remove, adjustUnread, refresh };
 }

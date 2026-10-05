@@ -7,7 +7,6 @@ import { localizePath, type Locale } from "@/shared/i18n/locales";
 import type { Messages } from "@/shared/i18n/messages";
 import { joinClassNames } from "@/shared/lib/class-names";
 import { Button } from "@/shared/ui/button";
-import { Container } from "@/shared/ui/container";
 import { LocaleSwitcher } from "@/shared/ui/locale-switcher";
 import { Logo } from "@/shared/ui/logo";
 import { signOut } from "../model/sign-in";
@@ -38,7 +37,7 @@ export function AppHeader({ locale, messages, homeLabel, languageLabel }: AppHea
 
   return (
     <header className="border-b border-line">
-      <Container className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3 sm:h-16 sm:flex-nowrap sm:gap-6 sm:py-0">
+      <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:h-16 sm:flex-nowrap sm:gap-6 sm:py-0">
         <Link href={localizePath(locale, "/")} aria-label={homeLabel} className="mr-auto rounded-control sm:mr-0">
           <Logo variant="mark" />
         </Link>
@@ -68,7 +67,7 @@ export function AppHeader({ locale, messages, homeLabel, languageLabel }: AppHea
         <Button variant="ghost" disabled={isSigningOut} onClick={() => void leave()} className="max-sm:px-3">
           {messages.signOut}
         </Button>
-      </Container>
+      </div>
     </header>
   );
 }

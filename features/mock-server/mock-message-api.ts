@@ -2,6 +2,7 @@ import type { MessageApi } from "@/features/message/api/message-api";
 import {
   MAX_BATCH_IDS,
   MESSAGE_PAGE_LIMIT,
+  messageSummarySchema,
   type BatchRequest,
   type MessageScope,
   type MessageSummary,
@@ -26,9 +27,9 @@ const notFound = (): Promise<never> => mockFail({ status: 404, code: "NOT_FOUND"
 const invalid = (path: string, issue: string): Promise<never> =>
   mockFail({ status: 400, code: "VALIDATION_FAILED", details: [{ path, issue }] });
 
+/** The schema drops `body`, which the real API serves only from `/content`. */
 function summaryOf(message: StoredMessage): MessageSummary {
-  const { body: _body, ...summary } = message;
-  return summary;
+  return messageSummarySchema.parse(message);
 }
 
 function findMessage(stored: StoredAccount, id: string): StoredMessage | undefined {
